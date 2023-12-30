@@ -16,6 +16,11 @@ app.post("/sample-route", async (req, res) => {
   return res.sendStatus(418);
 });
 
+app.get("/sample-route", async (req, res) => {
+  return res.send("This is a GET request to /sample-route");
+
+})
+
 app.get("/", async(req, res) => {
   res.send("Welcome to Health Engine Buddy")
 })
