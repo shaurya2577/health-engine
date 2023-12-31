@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const db = require("./db");
 const constants = require("./constants");
+const pool = require("./db")
 
 const app = express();
 
@@ -11,14 +12,29 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ROUTES
-app.post("/sample-route", async (req, res) => {
-  return res.sendStatus(418);
-});
 
-app.get("/sample-route", async (req, res) => {
-  return res.send("This is a GET request to /sample-route");
+// create a new resource
+app.post('/test/make-new-resource', async (req, res) => {
+  const { description } = req.body;
+  const { title } = req.body;
+  const { tag } = req.body;
+  const newResource = await pool.query("INSERT INTO resources (description, title, class) VALUES($1, $2, $3) RETURNING *", 
+  [description, title, tag]);
 
+  res.json(newResource.rows[0])
+})
+
+// get all resources 
+app.get("/test/see-all-resources", async (req, res) => {
+  const allResources = await pool.query("SELECT * FROM resources")
+  res.json(allResources.rows);
+})
+
+// see one resource
+app.get('/test/:resourceID', async (req, res) => {
+  const { resourceID } = req.params;
+  const resource_fetch = await pool.query("SELECT * FROM resources WHERE resource_id = $1", [resourceID])
+  res.json(resource_fetch.rows[0]);
 })
 
 app.get("/", async(req, res) => {
