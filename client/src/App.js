@@ -1,4 +1,5 @@
 import Home from "./pages/Home";
+import NewResource from "./pages/NewResource";
 
 import {
   BrowserRouter as Router,
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />}></Route>
         <Route path="/home" element={<Home />}></Route>
+        <Route path="/new" element={<NewResource />}></Route>
       </Routes>
     </BrowserRouter>
   );

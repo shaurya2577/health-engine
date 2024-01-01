@@ -1,9 +1,11 @@
 import React from "react";
 import { server_url } from "../constants";
+import ResourceCard from "../Card.js" 
 
 function Home() {
   async function im_a_teapot() {
     try {
+
       const response = await fetch(`${server_url}/sample-route`, {
         method: "POST",
       });
@@ -19,16 +21,22 @@ function Home() {
     }
   }
   return (
-    <div className="text-3xl flex flex-col h-screen">
-      hello world
-      <br></br>- health engine
-      <button
-        onClick={im_a_teapot}
-        className="border-black border-2 p-2 mt-3 w-64 hover:bg-lime-100"
-      >
-        click me :)
+    <div>
+    <br></br>
+    <div className="text-5xl flex flex-col h-screen items-center">
+      Health Engine Resource Dashboard
+      <br></br><br></br>
+      <button onClick={event => window.location.href='/new'} className="text-2xl border-black border-2 p-2 mt-3 w-64 hover:bg-lime-100">
+        Create New Resource
       </button>
+    <div className="text-2xl flex flex-row p-20 mr-5">
+      <ResourceCard></ResourceCard>
+      <ResourceCard></ResourceCard>
+      <ResourceCard></ResourceCard>
+      </div>
     </div>
+    </div>
+
   );
 }
 
