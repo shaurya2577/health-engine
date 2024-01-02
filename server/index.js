@@ -14,7 +14,7 @@ app.use(express.json());
 
 
 // create a new resource
-app.post('/newresource', async (req, res) => {
+app.post('/newResource', async (req, res) => {
   const { description } = req.body;
   const { title } = req.body;
   const { tag } = req.body;
@@ -25,13 +25,13 @@ app.post('/newresource', async (req, res) => {
 
 
 // get all resources 
-app.get("/seeresources", async (req, res) => {
+app.get("/resources", async (req, res) => {
   const allResources = await pool.query("SELECT * FROM resources");
   res.json(allResources.rows);
 })
 
 // see one resource
-app.get('/:resourceID', async (req, res) => {
+app.get('/resources/:resourceID', async (req, res) => {
   const { resourceID } = req.params;
   const resource_fetch = await pool.query("SELECT * FROM resources WHERE resource_id = $1", [resourceID]);
   res.json(resource_fetch.rows[0]);

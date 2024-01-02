@@ -1,22 +1,26 @@
 import React, { useState } from "react";
 import { server_url } from "../constants";
+import { useNavigate } from "react-router-dom";
+
 
 function NewResource() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [tag, setTag] = useState('partnership');
+    const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         const body = {'description': description, 'title': title, 'tag': tag};
 
-        const response = await fetch("http://localhost:3002/newresource", {
+        const response = await fetch("http://localhost:3002/newResource", {
             method: "POST", 
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(body)
         });
 
         console.log(JSON.stringify(body));
+        navigate("/");
 
         if (response.ok) {
             const data = await response.json();
@@ -24,6 +28,7 @@ function NewResource() {
         } else {
             console.error("Failed to add new resource");
         }
+
     };
 
     return (
