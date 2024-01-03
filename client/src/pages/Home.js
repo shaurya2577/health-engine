@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { server_url } from "../constants";
+import Dashboard from "../pages/Dashboard";
+import * as constants from "../constants";
 // import ResourceCard from "../Card.js" 
 
 function Home() {
@@ -22,7 +23,7 @@ function Home() {
 
   const allResources = async() => {
     try{
-      const response = await fetch(`${server_url}/resources`);  
+      const response = await fetch(`${constants.server_url}/resources`);  
       const json_response = await response.json();
       setResources(json_response);
     } catch (error) {
@@ -35,6 +36,9 @@ function Home() {
   }, []);
 
   const [allresources, selectAllResources] = useState(true);
+  console.log(resourcesAll)
+
+
   const toggleDefault = () => {
     selectAllResources(!allresources);
     selectGuide(guide);
@@ -50,7 +54,7 @@ function Home() {
     selectDataset(false);
   };
   const resourcesGuides = resourcesAll.filter(function(item){
-    return item.class="guide";
+    return item.class == "guide";
   });
 
   const [partnership, selectPartnership] = useState(false);
@@ -61,7 +65,7 @@ function Home() {
     selectDataset(false);
   };
   const resourcesPartnerships = resourcesAll.filter(function(item){
-    return item.class="partnership";
+    return item.class=="partnership";
   });
 
   const [dataset, selectDataset] = useState(false);
@@ -71,11 +75,9 @@ function Home() {
     selectPartnership(false);
     selectDataset(true);
   };
-  const resourceDatasets = resourcesAll.filter(function(item){
-    return item.class="dataset";
+  const resourcesDatasets = resourcesAll.filter(function(item){
+    return item.class=="dataset";
   });
-
-  // console.log(resources);
 
   return (
     <div>
@@ -87,54 +89,32 @@ function Home() {
         Create New Resource
       </button>
 
-    <div>
-      <button onClick={ toggleDefault } className="bg-orange-500 hover:bg-white-300 text-white py-2 px-4 rounded">Default</button>
-      {allresources ? (
-        <div className="text-2xl p-20 mr-5 grid grid-cols-3 gap-8">
-        {resourcesAll.map((resource_entry) => (
-          <div key={resource_entry.resource_id} className="w-80 h-96 bg-white border border-gray-200 rounded-lg shadow overflow-hidden dark:bg-gray-800 dark:border-gray-700">
-            {/* <a href="#">
-              <img className="rounded-t-lg" src="/docs/images/blog/image-1.jpg" alt="" />
-            </a> */}
-            <div className="p-6">
-              <a>
-                <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{resource_entry.title}</h5>
-              </a>
-              <p className="mb-3 font-normal text-gray-700 dark:text-gray-400 whitespace-normal break-words">{resource_entry.description}</p>
-              <a className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                {resource_entry.class}
-                <svg className="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" fill="none" viewBox="0 0 14 10">
-                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        ))}
-      </div>
+  <div className="flex space-x-4 mt-10 text-2xl justify-start pl-4">
+    <button onClick={ toggleDefault } className="float-left bg-orange-500 hover:bg-white-300 text-white py-2 px-4 rounded">Default</button>
+    <button onClick={ toggleGuides } className="float-left bg-blue-500 hover:bg-white-300 text-white py-2 px-4 rounded">Guides</button>
+    <button onClick= { togglePartnership } className="float-left bg-red-500 hover:bg-white-300 text-white py-2 px-4 rounded">Partnerships</button>
+    <button onClick={ toggleDataset } className="float-left bg-purple-500 hover:bg-white-300 text-white py-2 px-4 rounded">Datasets</button>
+  </div>
+  
+    {allresources ? (
+      <Dashboard filteredResources={ resourcesAll }></Dashboard>
       ) : null}
-    </div>
-    <div>
-      <button onClick={ toggleGuides } className="bg-blue-500 hover:bg-white-300 text-white py-2 px-4 rounded">Guides</button>
-      {guide ? (
-        <p>testing guides</p>
-      ) : null}
-    </div>
-    <div>
-      <button onClick= { togglePartnership } className="bg-red-500 hover:bg-white-300 text-white py-2 px-4 rounded">Partnerships</button>
-      {partnership ? (
-        <p>testing partnership</p>
-      ) : null}
-    </div>
 
-    <div>
-      <button onClick={ toggleDataset } className="bg-orange-500 hover:bg-white-300 text-white py-2 px-4 rounded">Datasets</button>
-      {dataset ? (
-        <p>testing dataset</p>
+    {partnership ? (
+      <Dashboard filteredResources={ resourcesPartnerships }></Dashboard>
       ) : null}
+
+    {dataset ? (
+      <Dashboard filteredResources={ resourcesDatasets }></Dashboard>
+      ) : null}
+
+    {guide ? (
+      <Dashboard filteredResources={ resourcesGuides }></Dashboard>
+      ) : null}
+          
     </div>
 
 
-    </div>
     </div>
 
   );
