@@ -40,15 +40,15 @@ function Home() {
 
 
   const toggleDefault = () => {
-    selectAllResources(!allresources);
-    selectGuide(guide);
-    selectPartnership(partnership);
+    selectAllResources(true);
+    selectGuide(false);
+    selectPartnership(false);
     selectDataset(false);
   };
 
   const [guide, selectGuide] = useState(false);
   const toggleGuides = () => {
-    selectGuide(!guide);
+    selectGuide(true);
     selectAllResources(false);
     selectPartnership(false);
     selectDataset(false);

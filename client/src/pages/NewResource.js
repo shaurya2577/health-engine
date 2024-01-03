@@ -37,10 +37,10 @@ function NewResource() {
         Create a new resource.
         <br></br><br></br>
         <form onSubmit={handleSubmit}>
-            <label htmlFor="title">Title:</label> <input className="form-control" label="title" type="text" value={title} onChange={(event) => setTitle(event.target.value)}></input><br></br>
-            <label htmlFor="descr">Description:</label><input className="form-control" label="descr" type="text" value={description} onChange={(event) => setDescription(event.target.value)}></input><br></br>
+            <label htmlFor="title">Title:</label> <input required minlength="5" maxlength="30" className="form-control" label="title" type="text" value={title} onChange={(event) => setTitle(event.target.value)}></input><br></br>
+            <label htmlFor="descr">Description:</label><input required minlength="5" maxlength = "200" className="form-control" label="descr" type="text" value={description} onChange={(event) => setDescription(event.target.value)}></input><br></br>
             <label htmlFor="resource_class" value={tag}>Type:</label>
-            <select id="resource_class" className="form-control" value={tag} onChange={(event) => setTag(event.target.value)}>
+            <select required id="resource_class" className="form-control" value={tag} onChange={(event) => setTag(event.target.value)}>
                 <option value="partnership">Partnership</option>
                 <option value="dataset">Dataset</option>
                 <option value="guide">Guide</option>
