@@ -10,6 +10,7 @@ module.exports = {
         "button-red": "#FB5B4F",
         "button-hover-red": "#f2473a",
         "card-orange": "#fa7c5c",
+        "site-black": "#260b00",
       },
     },
   },

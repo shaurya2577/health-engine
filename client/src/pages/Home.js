@@ -38,12 +38,14 @@ function Home() {
   return (
     <BaseLayout>
       <div>
-        <div className="flex flex-col items-center pt-12 mb-8 font-bold">
+        <div className="flex flex-col items-center pt-12 mb-8 font-bold text-site-black">
           <div className="text-[50px]">Health Engine</div>
           <div className="text-[65px] -mt-6">Founder Portal</div>
         </div>
-        <div className="mx-24 text-4xl font-bold">Resource List</div>
-        <div className="mx-24 bg-black h-[3px] mt-2"></div>
+        <div className="mx-24 text-4xl font-bold text-site-black">
+          Resource List
+        </div>
+        <div className="mx-24 bg-site-black h-[3px] mt-2"></div>
         <div className="flex space-x-4 mt-4 text-lg justify-start mx-24">
           <button
             onClick={() => toggleFilter("*")}

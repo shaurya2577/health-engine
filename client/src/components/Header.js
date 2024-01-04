@@ -10,7 +10,7 @@ function Header() {
             <img src={logo} />
           </div>
         </a>
-        <div className="flex text-xl justify-self-end gap-7 font-medium mt-5 mr-4">
+        <div className="flex text-xl justify-self-end gap-7 font-medium mt-5 mr-4 text-site-black">
           <a href="/">
             <div>Resources</div>
           </a>
