@@ -1,122 +1,82 @@
 import React, { useEffect, useState } from "react";
-import Dashboard from "../pages/Dashboard";
-import * as constants from "../constants";
-// import ResourceCard from "../Card.js" 
+import BaseLayout from "../layouts/BaseLayout";
+import ResourceDashboard from "../components/ResourceDashboard";
+import { server_url } from "../constants";
 
 function Home() {
-  
-    // render(
-    //   <form className="text-2xl flex flex-col h-screen items-left">
-    //     <label htmlFor="search_filter">Select Resource Type</label><select id="search_filter" className="form-control">
-    //         <option value="all">All</option>
-    //         <option value="partnership">Partnership</option>
-    //         <option value="dataset">Dataset</option>
-    //         <option value="guide">Guide</option>
-    //     </select><br></br><br></br>
-    //     <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" onClick={props.onClick}>Submit</button>
-    //   </form>
-    // )
+  const [allResources, setAllResources] = useState([]);
+  const [filteredResources, setFilteredResources] = useState([]);
 
-  
-  const [resourcesAll, setResources] = useState([]);
-  // console.log(resourcesGuides)
-
-  const allResources = async() => {
-    try{
-      const response = await fetch(`${constants.server_url}/resources`);  
-      const json_response = await response.json();
-      setResources(json_response);
+  const getAllResources = async () => {
+    try {
+      const response = await fetch(`${server_url}/resources`);
+      const data = await response.json();
+      setAllResources(data);
+      setFilteredResources(allResources);
     } catch (error) {
-        console.error(error.message);
+      console.error(error.message);
     }
   };
 
+  function toggleFilter(filter) {
+    if (filter === "*") {
+      setFilteredResources(allResources);
+    } else {
+      const filtered = allResources.filter((item) => item.class === filter);
+      setFilteredResources(filtered);
+    }
+  }
+
   useEffect(() => {
-    allResources();
+    getAllResources();
   }, []);
 
-  const [allresources, selectAllResources] = useState(true);
-  console.log(resourcesAll)
-
-
-  const toggleDefault = () => {
-    selectAllResources(true);
-    selectGuide(false);
-    selectPartnership(false);
-    selectDataset(false);
-  };
-
-  const [guide, selectGuide] = useState(false);
-  const toggleGuides = () => {
-    selectGuide(true);
-    selectAllResources(false);
-    selectPartnership(false);
-    selectDataset(false);
-  };
-  const resourcesGuides = resourcesAll.filter(function(item){
-    return item.class == "guide";
-  });
-
-  const [partnership, selectPartnership] = useState(false);
-  const togglePartnership = () => {
-    selectGuide(false);
-    selectAllResources(false);
-    selectPartnership(true);
-    selectDataset(false);
-  };
-  const resourcesPartnerships = resourcesAll.filter(function(item){
-    return item.class=="partnership";
-  });
-
-  const [dataset, selectDataset] = useState(false);
-  const toggleDataset = () => {
-    selectGuide(false);
-    selectAllResources(false);
-    selectPartnership(false);
-    selectDataset(true);
-  };
-  const resourcesDatasets = resourcesAll.filter(function(item){
-    return item.class=="dataset";
-  });
+  useEffect(() => {
+    setFilteredResources(allResources);
+  }, [allResources]);
 
   return (
-    <div>
-    <br></br>
-    <div className="text-5xl flex flex-col h-screen items-center pt-20">
-      Health Engine Resource Dashboard
-      <br></br><br></br>
-      <button onClick={event => window.location.href='/new'} className="text-2xl border-black border-2 p-2 mt-3 w-64 hover:bg-lime-100">
-        Create New Resource
-      </button>
-
-  <div className="flex space-x-4 mt-10 text-2xl justify-start pl-4">
-    <button onClick={ toggleDefault } className="float-left bg-orange-500 hover:bg-white-300 text-white py-2 px-4 rounded">Default</button>
-    <button onClick={ toggleGuides } className="float-left bg-blue-500 hover:bg-white-300 text-white py-2 px-4 rounded">Guides</button>
-    <button onClick= { togglePartnership } className="float-left bg-red-500 hover:bg-white-300 text-white py-2 px-4 rounded">Partnerships</button>
-    <button onClick={ toggleDataset } className="float-left bg-purple-500 hover:bg-white-300 text-white py-2 px-4 rounded">Datasets</button>
-  </div>
-  
-    {allresources ? (
-      <Dashboard filteredResources={ resourcesAll }></Dashboard>
-      ) : null}
-
-    {partnership ? (
-      <Dashboard filteredResources={ resourcesPartnerships }></Dashboard>
-      ) : null}
-
-    {dataset ? (
-      <Dashboard filteredResources={ resourcesDatasets }></Dashboard>
-      ) : null}
-
-    {guide ? (
-      <Dashboard filteredResources={ resourcesGuides }></Dashboard>
-      ) : null}
-          
-    </div>
-
-
-    </div>
-
+    <BaseLayout>
+      <div>
+        <div className="flex flex-col items-center pt-12 mb-8 font-bold">
+          <div className="text-[50px]">Health Engine</div>
+          <div className="text-[65px] -mt-6">Founder Portal</div>
+        </div>
+        <div className="mx-24 text-4xl font-bold">Resource List</div>
+        <div className="mx-24 bg-black h-[3px] mt-2"></div>
+        <div className="flex space-x-4 mt-4 text-lg justify-start mx-24">
+          <button
+            onClick={() => toggleFilter("*")}
+            className="bg-button-red text-white py-2 px-4 rounded-full font-semibold hover:bg-button-hover-red"
+          >
+            All
+          </button>
+          <button
+            onClick={() => toggleFilter("guide")}
+            className="bg-button-red text-white py-2 px-4 rounded-full font-semibold hover:bg-button-hover-red"
+          >
+            Guides
+          </button>
+          <button
+            onClick={() => toggleFilter("partnership")}
+            className="bg-button-red text-white py-2 px-4 rounded-full font-semibold hover:bg-button-hover-red"
+          >
+            Partnerships
+          </button>
+          <button
+            onClick={() => toggleFilter("dataset")}
+            className="bg-button-red text-white py-2 px-4 rounded-full font-semibold hover:bg-button-hover-red"
+          >
+            Datasets
+          </button>
+        </div>
+        <div className="mx-24 mb-24">
+          <ResourceDashboard
+            filteredResources={filteredResources}
+          ></ResourceDashboard>
+        </div>
+      </div>
+    </BaseLayout>
   );
 }
 
