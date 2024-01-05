@@ -1,22 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 import "./ResourceCard.css";
+
 
 function ResourceCard(props) {
   const title = props.title;
   const description = props.description;
   const tag = props.tag.charAt(0).toUpperCase() + props.tag.slice(1);
 
-  function handleClick() {
-    console.log(
-      "this action should open up a model that displays the full text and also has a link to the resource"
-    );
+  const [showPopup, activatePopup] = useState(false);
+
+  function handleClick(props) {
+    activatePopup(true);
+  }
+
+  function closeClick(props){
+    activatePopup(false);
   }
 
   return (
+    <div>
+      {showPopup && (
+        <div className="absolute top-0 left-0 w-screen h-screen bg-gray-900 bg-opacity-50 z-49">
+        <div className="absolute top-[14vh] left-[10vw] z-50 w-[80vw] h-[80vh] bg-gray-400 justify-center items-center">
+        <h5 className="ml-10 mt-7 text-white font-semibold top-0 left-0 pt-[12px]"> {tag} </h5>
+        <div className="px-6 pb-6 pt-1 ml-10 mt-10 ">
+          <h1 className="text-white mb-2 text-7xl font-bold tracking-tight text-gray-900 dark:text-white"> {title} </h1>
+          <h3 className="ml-1 text-3xl font-semibold text-gray-900"> {description} </h3>
+          <button className="close" onClick={closeClick}>
+            <span className="absolute top-0 right-0 m-4 cursor-pointer text-3xl" aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        </div>
+        </div>
+      )}
     <div
-      className="bg-card-orange rounded-xl shadow-lg shadow-orange-200 min-h-[190px] hover:cursor-pointer"
-      onClick={handleClick}
-    >
+      className="bg-card-orange rounded-xl shadow-lg shadow-orange-200 min-h-[190px] hover:cursor-pointer" onClick={handleClick}>
       <div className="text-white font-semibold text-right px-4 pt-[12px]">
         {tag}
       </div>
@@ -33,6 +51,7 @@ function ResourceCard(props) {
           Learn More {">"}
         </button>
       </div>
+    </div>
     </div>
   );
 }

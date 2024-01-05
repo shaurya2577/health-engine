@@ -30,11 +30,12 @@ app.post("/newResource", async (req, res) => {
 });
 
 // get all resources
-app.get("/resources", async (_req, res) => {
+app.get("/resources", async (req, res) => {
   try {
     const allResources = await pool.query("SELECT * FROM resources;");
     res.json(allResources.rows);
   } catch (error) {
+    console.log(error);
     res.status(500).send("Server or database error");
   }
 });
