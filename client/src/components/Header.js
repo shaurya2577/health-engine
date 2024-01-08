@@ -1,5 +1,7 @@
 import React from "react";
 import logo from "../assets/logo-full.png";
+import SignInButton from "../components/Login";
+import SignOutButton from "../components/Logout";
 
 function Header() {
   return (
@@ -20,9 +22,13 @@ function Header() {
           <a href="/todo">
             <div>About</div>
           </a>
-          <a href="/todo">
-            <div>Log out</div>
-          </a>
+          {/* <button href="/todo">
+            <div>Log in</div>
+          </button> */}
+          <div>
+            {/* <SignInButton></SignInButton> */}
+          {/* <SignOutButton></SignOutButton> */}
+          </div>
         </div>
       </div>
     </div>

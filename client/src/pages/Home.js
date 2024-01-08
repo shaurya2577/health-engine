@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import BaseLayout from "../layouts/BaseLayout";
 import ResourceDashboard from "../components/ResourceDashboard";
 import { server_url } from "../constants";
+import SignInButton from "../components/Login";
+
 
 function Home() {
   const [allResources, setAllResources] = useState([]);
@@ -41,6 +43,7 @@ function Home() {
         <div className="flex flex-col items-center pt-12 mb-8 font-bold text-site-black">
           <div className="text-[50px]">Health Engine</div>
           <div className="text-[65px] -mt-6">Founder Portal</div>
+          {/* <div><SignInButton></SignInButton></div> */}
         </div>
         <div className="mx-24 text-4xl font-bold text-site-black">
           Resource List
