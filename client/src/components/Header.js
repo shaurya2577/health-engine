@@ -1,9 +1,54 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../assets/logo-full.png";
-import SignInButton from "../components/Login";
-import SignOutButton from "../components/Logout";
+import { jwtDecode } from "jwt-decode"
+import { useAuth } from "../AuthContext"; // Adjust the path accordingly
+
 
 function Header() {
+  const [user, setUser] = useState({});
+  const { isSignedIn, setIsSignedIn } = useAuth();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedSignInStatus = localStorage.getItem("isSignedIn");
+
+    if (storedUser && storedSignInStatus) {
+      setUser(JSON.parse(storedUser));
+      setIsSignedIn(JSON.parse(storedSignInStatus));
+    }
+  }, [setIsSignedIn]);
+  
+  function handleCallbackResponse(response) {
+    const userObject = jwtDecode(response.credential);
+    console.log(userObject);
+    setUser(userObject);
+    setIsSignedIn(true);
+    localStorage.setItem("user", JSON.stringify(userObject));
+    localStorage.setItem("isSignedIn", JSON.stringify(true));
+    document.getElementById("signInDiv").hidden= true;
+  };
+
+  function handleSignOut(event) {
+    localStorage.removeItem("user");
+    localStorage.removeItem("isSignedIn");
+    document.getElementById("signInDiv").hidden= false;
+    setIsSignedIn(false);
+    setUser({});
+  }
+
+  useEffect(() => {
+    /* global google */
+    google.accounts.id.initialize({
+      client_id: "731231387889-jtv4doi6v3asmmhuf7d7537jkjcpsfta.apps.googleusercontent.com", 
+      callback: handleCallbackResponse
+    });
+
+    google.accounts.id.renderButton(
+      document.getElementById("signInDiv"),
+      {theme: "dark", width: 100, height: 50}
+    )
+  }, []);
+
   return (
     <div className="p-6">
       <div className="grid grid-cols-2">
@@ -22,13 +67,15 @@ function Header() {
           <a href="/todo">
             <div>About</div>
           </a>
-          {/* <button href="/todo">
-            <div>Log in</div>
-          </button> */}
-          <div>
-            {/* <SignInButton></SignInButton> */}
-          {/* <SignOutButton></SignOutButton> */}
-          </div>
+          
+          <div id="signInDiv" className={`mb-5 ${isSignedIn ? 'hidden' : ''}`}></div>
+          { isSignedIn && 
+            <div id="userProfile" className="flex items-center">
+              <img src={user.picture} className="rounded-full w-10 h-10 mr-2" alt="User" />
+              <div className=" mr-5">{user.name}</div>
+              <button onClick={(e) => handleSignOut(e)} className="ml-5">Sign Out</button>
+            </div>
+          }
         </div>
       </div>
     </div>
