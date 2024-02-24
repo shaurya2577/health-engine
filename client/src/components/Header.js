@@ -1,12 +1,26 @@
 import React, { useEffect, useState } from "react";
 import logo from "../assets/logo-full.png";
-import { jwtDecode } from "jwt-decode"
+import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../AuthContext"; // Adjust the path accordingly
-
 
 function Header() {
   const [user, setUser] = useState({});
+  const [isOpen, setIsOpen] = useState(false);
   const { isSignedIn, setIsSignedIn } = useAuth();
+
+  const loadGoogleScript = () => {
+    return new Promise((resolve) => {
+      if (typeof google !== "undefined") {
+        resolve();
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = "https://accounts.google.com/gsi/client";
+      script.onload = () => resolve(); // Resolve promise when script is loaded
+      document.body.appendChild(script);
+    });
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -17,47 +31,51 @@ function Header() {
       setIsSignedIn(JSON.parse(storedSignInStatus));
     }
   }, [setIsSignedIn]);
-  
+
   function handleCallbackResponse(response) {
     const userObject = jwtDecode(response.credential);
-    console.log(userObject);
+    //console.log(userObject);
     setUser(userObject);
     setIsSignedIn(true);
     localStorage.setItem("user", JSON.stringify(userObject));
     localStorage.setItem("isSignedIn", JSON.stringify(true));
-    document.getElementById("signInDiv").hidden= true;
-  };
+    document.getElementById("signInDiv").hidden = true;
+  }
 
   function handleSignOut(event) {
     localStorage.removeItem("user");
     localStorage.removeItem("isSignedIn");
-    document.getElementById("signInDiv").hidden= false;
     setIsSignedIn(false);
     setUser({});
+    window.location.reload();
   }
 
   useEffect(() => {
-    /* global google */
-    google.accounts.id.initialize({
-      client_id: "731231387889-jtv4doi6v3asmmhuf7d7537jkjcpsfta.apps.googleusercontent.com", 
-      callback: handleCallbackResponse
-    });
+    loadGoogleScript().then(() => {
+      /* global google */
+      google.accounts.id.initialize({
+        client_id:
+          "731231387889-jtv4doi6v3asmmhuf7d7537jkjcpsfta.apps.googleusercontent.com",
+        callback: handleCallbackResponse,
+      });
 
-    google.accounts.id.renderButton(
-      document.getElementById("signInDiv"),
-      {theme: "dark", width: 100, height: 50}
-    )
+      google.accounts.id.renderButton(document.getElementById("signInDiv"), {
+        theme: "dark",
+        width: 100,
+        height: 50,
+      });
+    });
   }, []);
 
   return (
     <div className="p-6">
-      <div className="grid grid-cols-2">
-        <a href="/">
+      <div className="grid grid-cols-3">
+        <a href="/" className="col-span-1">
           <div className="w-64 ml-3">
             <img src={logo} />
           </div>
         </a>
-        <div className="flex text-xl justify-self-end gap-7 font-medium mt-5 mr-4 text-site-black">
+        <div className="flex text-xl justify-self-end gap-7 font-medium mt-5 mr-4 text-site-black col-span-2">
           <a href="/">
             <div>Resources</div>
           </a>
@@ -67,15 +85,48 @@ function Header() {
           <a href="/todo">
             <div>About</div>
           </a>
-          
-          <div id="signInDiv" className={`mb-5 ${isSignedIn ? 'hidden' : ''}`}></div>
-          { isSignedIn && 
-            <div id="userProfile" className="flex items-center">
-              <img src={user.picture} className="rounded-full w-10 h-10 mr-2" alt="User" />
-              <div className=" mr-5">{user.name}</div>
-              <button onClick={(e) => handleSignOut(e)} className="ml-5">Sign Out</button>
+
+          {!isSignedIn && (
+            <div>
+              <div id="signInDiv" className="-mt-2"></div>
             </div>
-          }
+          )}
+
+          {isSignedIn && (
+            <div>
+              <div
+                className="cursor-pointer"
+                onClick={() => setIsOpen(!isOpen)}
+              >
+                {user.name}
+              </div>
+              {isOpen && (
+                <div className="absolute right-6 mt-2 w-48 bg-white shadow-md rounded-md py-2">
+                  {/*
+                  <div className="block px-4 py-2 text-sm text-gray-700">
+                    {user.email}
+                  </div>
+                  */}
+                  <div
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                    onClick={handleSignOut}
+                  >
+                    Logout
+                  </div>
+                </div>
+              )}
+              {/*
+              <img
+                src={user.picture}
+                alt="User"
+                className="rounded-full w-10 h-10 mr-2"
+              />
+              <button onClick={(e) => handleSignOut(e)} className="ml-5">
+                Sign Out
+              </button>
+              */}
+            </div>
+          )}
         </div>
       </div>
     </div>
