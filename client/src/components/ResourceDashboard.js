@@ -11,6 +11,7 @@ function ResourceDashboard(props) {
             title={resource_entry.title}
             description={resource_entry.description}
             tag={resource_entry.class}
+            link={resource_entry.link}
           ></ResourceCard>
         </div>
       ))}
