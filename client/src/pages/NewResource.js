@@ -9,6 +9,7 @@ function NewResource() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tag, setTag] = useState("Partnership");
+  const [link, setLink] = useState("")
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -77,6 +78,18 @@ function NewResource() {
                   className="pl-2 rounded-md py-1 placeholder:italic text-lg"
                   onChange={(e) => setTag(e.target.value.toLowerCase())}
                 ></input>
+
+            <div className="mt-8">
+                <div className="mb-2">Link to Resource</div>
+                <textarea
+                  rows="4"
+                  cols="100"
+                  name="text"
+                  placeholder="link"
+                  className="p-2 placeholder:italic w-full text-lg rounded-md"
+                  onChange={(e) => setLink(e.target.value)}
+                ></textarea>
+              </div>
               </div>
               <div>
                 <button
@@ -93,12 +106,14 @@ function NewResource() {
                   title="Default Title"
                   description="Default Description"
                   tag={tag}
+                  link = "https://readysethealth.io"
                 ></ResourceCard>
               ) : (
                 <ResourceCard
                   title={title}
                   description={description}
                   tag={tag}
+                  link={link}
                 ></ResourceCard>
               )}
               <div className="mt-4 italic">
