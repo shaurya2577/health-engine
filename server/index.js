@@ -12,6 +12,7 @@ app.use(express.json());
 
 // create a new resource
 app.post("/newResource", async (req, res) => {
+  console.log("hi");
   const { description, title, tag } = req.body;
   if (!description || !title || !tag) {
     return res.status(400).send("Input is not formatted properly");
@@ -22,9 +23,11 @@ app.post("/newResource", async (req, res) => {
       "INSERT INTO resources (description, title, class) VALUES($1, $2, $3) RETURNING *;",
       [description, title, tag]
     );
+    console.log("done");
 
     res.json(newResource.rows[0]);
   } catch (error) {
+    console.log(error);
     res.status(500).send("Server or database error");
   }
 });

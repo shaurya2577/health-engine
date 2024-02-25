@@ -69,18 +69,26 @@ function NewResource() {
                 TODO: allow frontend user to select "other" option and add a new custom tag
                  */}
                 <div className="mb-2">
-                  Card Tag (Partnership, Dataset, Guide)
+                  Card Tag (partnership, dataset, guide)
                 </div>
                 <input
                   required
                   placeholder="partnership"
                   className="pl-2 rounded-md py-1 placeholder:italic text-lg"
-                  onChange={(e) => setTag(e.target.value)}
+                  onChange={(e) => setTag(e.target.value.toLowerCase())}
                 ></input>
+              </div>
+              <div>
+                <button
+                  className="bg-card-orange text-white font-bold py-2 px-4 rounded mt-8 hover:opacity-90"
+                  onClick={handleSubmit}
+                >
+                  Submit
+                </button>
               </div>
             </div>
             <div className="w-2/3 mt-4 ml-24">
-              {title == "" && description == "" ? (
+              {title === "" && description === "" ? (
                 <ResourceCard
                   title="Default Title"
                   description="Default Description"
