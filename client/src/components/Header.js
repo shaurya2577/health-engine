@@ -79,10 +79,10 @@ function Header() {
           <a href="/">
             <div>Resources</div>
           </a>
-          <a href="/todo">
+          <a href="https://airtable.com/appDKUYdh9WE3Zjhs/shrolgo8UQ4wyMNuw">
             <div>Investor Database</div>
           </a>
-          <a href="/todo">
+          <a href="https://readysethealth.io">
             <div>About</div>
           </a>
 

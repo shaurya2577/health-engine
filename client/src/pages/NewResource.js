@@ -10,11 +10,11 @@ function NewResource() {
   const [description, setDescription] = useState("");
   const [tag, setTag] = useState("Partnership");
   const [link, setLink] = useState("")
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const body = { description: description, title: title, tag: tag };
+    const body = { description: description, title: title, tag: tag, link: link};
 
     const response = await fetch("http://localhost:3002/newResource", {
       method: "POST",
@@ -82,7 +82,7 @@ function NewResource() {
             <div className="mt-8">
                 <div className="mb-2">Link to Resource</div>
                 <textarea
-                  rows="4"
+                  rows="2"
                   cols="100"
                   name="text"
                   placeholder="link"
@@ -101,12 +101,12 @@ function NewResource() {
               </div>
             </div>
             <div className="w-2/3 mt-4 ml-24">
-              {title === "" && description === "" ? (
+              {title === "" && description === "" && link === "" ? (
                 <ResourceCard
                   title="Default Title"
                   description="Default Description"
                   tag={tag}
-                  link = "https://readysethealth.io"
+                  link ="readysethealth.io"
                 ></ResourceCard>
               ) : (
                 <ResourceCard

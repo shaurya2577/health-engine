@@ -5,15 +5,36 @@ function PasswordEntry({ setPasswordVerified }) {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     // Check if the password is correct
-    if (password === process.env.REACT_APP_LOGIN_PASSWORD) { // Replace "your_password_here" with your actual password
-        setPasswordVerified(true);
-        navigate('/newResource')
-    } else {
-      alert("Incorrect password. Please try again.");
-      setPassword("");
+    try {
+      const response = await fetch("http://localhost:3002/verifylogin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      console.log(response.body)
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.status == true) {
+          setPasswordVerified(true);
+          navigate('/newResource');
+        } else {
+          alert("Incorrect password. Please try again.");
+          setPassword("");
+          return (
+            <h1>Error: Wrong Password</h1>
+          );
+          
+        }
+      } else {
+        console.error("Failed to verify password");
+      }
+    } catch (error) {
+      console.error("Error:", error);
     }
   };
 
