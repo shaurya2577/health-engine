@@ -43,6 +43,16 @@ app.get("/resources", async (req, res) => {
   }
 });
 
+app.post("/verifylogin", async (req, res) => {
+  const { password } = req.body;
+  const correct_ref = "readysethealth123"
+  if (password == correct_ref) {
+    res.status(200).json({ status: true });
+  }
+  else {
+    res.status(401).json({ status: false, message: 'Incorrect password' })
+}});
+
 // see one resource
 app.get("/resources/:resourceID", async (req, res) => {
   const { resource_id } = req.params;
