@@ -10,7 +10,7 @@ import { AuthProvider } from "../AuthContext";
 
 function NewResource() {
   const [title, setTitle] = useState("");
-  const [url, setURL] = useState("");
+  const [link, setURL] = useState("");
   const [description, setDescription] = useState("");
   const [tag, setTag] = useState("Partnership");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -26,7 +26,7 @@ function NewResource() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const body = { description: description, title: title, tag: tag };
+    const body = { description: description, title: title, tag: tag, link: link};
 
     const response = await fetch("http://localhost:3002/newResource", {
       method: "POST",
@@ -149,7 +149,7 @@ function NewResource() {
                 <div className="mb-2">Resource URL Link</div>
                 <input
                   required
-                  placeholder="url"
+                  placeholder="link"
                   className="pl-2 rounded-md py-1 placeholder:italic text-lg w-full"
                   onChange={(e) => {
                     setURL(e.target.value);
@@ -171,14 +171,14 @@ function NewResource() {
                   title="Default Title"
                   description="Default Description"
                   tag={tag}
-                  url={url}
+                  url={link}
                 ></ResourceCard>
               ) : (
                 <ResourceCard
                   title={title}
                   description={description}
                   tag={tag}
-                  url={url}
+                  url={link}
                 ></ResourceCard>
               )}
               <div className="mt-4 italic">

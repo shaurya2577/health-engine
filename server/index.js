@@ -13,15 +13,15 @@ app.use(express.json());
 // create a new resource
 app.post("/newResource", async (req, res) => {
   console.log("hi");
-  const { description, title, tag } = req.body;
-  if (!description || !title || !tag) {
+  const { description, title, tag, link} = req.body;
+  if (!description || !title || !tag || !link) {
     return res.status(400).send("Input is not formatted properly");
   }
 
   try {
     const newResource = await pool.query(
-      "INSERT INTO resources (description, title, class) VALUES($1, $2, $3) RETURNING *;",
-      [description, title, tag]
+      "INSERT INTO resources (description, title, class, link) VALUES($1, $2, $3, $4) RETURNING *;",
+      [description, title, tag, link]
     );
     console.log("done");
 
