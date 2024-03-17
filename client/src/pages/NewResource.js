@@ -1,20 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { server_url } from "../constants";
 import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+
 import ResourceCard from "../components/ResourceDashboard/ResourceCard";
 import BaseLayout from "../layouts/BaseLayout";
+import VerifyPassword from "../VerifyPassword";
 import { AuthProvider } from "../AuthContext";
 
 function NewResource() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tag, setTag] = useState("Partnership");
-  const [link, setLink] = useState("")
-  const navigate = useNavigate(); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const body = { description: description, title: title, tag: tag, link: link};
+    const body = { description: description, title: title, tag: tag };
 
     const response = await fetch("http://localhost:3002/newResource", {
       method: "POST",
@@ -22,16 +26,40 @@ function NewResource() {
       body: JSON.stringify(body),
     });
 
-    console.log(JSON.stringify(body));
     navigate("/");
 
     if (response.ok) {
       const data = await response.json();
-      console.log("New resource added:", data);
     } else {
       console.error("Failed to add new resource");
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let login = await VerifyPassword();
+        setIsLoggedIn(login);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error verifying login:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center h-[80vh] justify-center">
+        <div className="text-2xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <div>
@@ -78,18 +106,6 @@ function NewResource() {
                   className="pl-2 rounded-md py-1 placeholder:italic text-lg"
                   onChange={(e) => setTag(e.target.value.toLowerCase())}
                 ></input>
-
-            <div className="mt-8">
-                <div className="mb-2">Link to Resource</div>
-                <textarea
-                  rows="2"
-                  cols="100"
-                  name="text"
-                  placeholder="link"
-                  className="p-2 placeholder:italic w-full text-lg rounded-md"
-                  onChange={(e) => setLink(e.target.value)}
-                ></textarea>
-              </div>
               </div>
               <div>
                 <button
@@ -101,19 +117,17 @@ function NewResource() {
               </div>
             </div>
             <div className="w-2/3 mt-4 ml-24">
-              {title === "" && description === "" && link === "" ? (
+              {title === "" && description === "" ? (
                 <ResourceCard
                   title="Default Title"
                   description="Default Description"
                   tag={tag}
-                  link ="readysethealth.io"
                 ></ResourceCard>
               ) : (
                 <ResourceCard
                   title={title}
                   description={description}
                   tag={tag}
-                  link={link}
                 ></ResourceCard>
               )}
               <div className="mt-4 italic">

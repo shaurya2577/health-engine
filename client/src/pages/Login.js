@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function PasswordEntry({ setPasswordVerified }) {
+function Login({ setPasswordVerified }) {
   const [password, setPassword] = useState("");
+  const [msg, setMsg] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -15,23 +16,14 @@ function PasswordEntry({ setPasswordVerified }) {
         body: JSON.stringify({ password }),
       });
 
-      console.log(response.body)
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.status == true) {
-          setPasswordVerified(true);
-          navigate('/newResource');
-        } else {
-          alert("Incorrect password. Please try again.");
-          setPassword("");
-          return (
-            <h1>Error: Wrong Password</h1>
-          );
-          
-        }
+      const data = await response.json();
+      localStorage.setItem("password", password);
+      if (data.status == true) {
+        setMsg("");
+        navigate("/newResource");
       } else {
-        console.error("Failed to verify password");
+        setMsg("Incorrect password.");
+        setPassword("");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -39,26 +31,34 @@ function PasswordEntry({ setPasswordVerified }) {
   };
 
   return (
-    <div className="text-2xl ml-10 mt-10 flex flex-col h-screen">
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="password">Password:</label>{" "}
-        <input
-          required
-          type="password"
-          id="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-        />
-        <br />
-        <button
-          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-          type="submit"
-        >
-          Submit
-        </button>
-      </form>
+    <div className="flex items-center justify-center h-screen">
+      <div className="text-2xl ml-10 mt-10 w-96 ">
+        <div className="italics mb-8 text-base text-center">
+          Enter a password to edit resource cards
+        </div>
+        <form>
+          <input
+            required
+            type="text"
+            id="password"
+            className="w-full"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+          <div className="text-center text-sm italic text-red-400">{msg}</div>
+          <div className="flex justify-center">
+            <button
+              onClick={handleSubmit}
+              className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded inline-block mt-8"
+              type="submit"
+            >
+              continue
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
 
-export default PasswordEntry;
+export default Login;
