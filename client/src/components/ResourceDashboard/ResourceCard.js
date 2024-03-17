@@ -5,6 +5,7 @@ function ResourceCard(props) {
   const title = props.title;
   const description = props.description;
   const tag = props.tag.charAt(0).toUpperCase() + props.tag.slice(1);
+  const url = props.url;
 
   const [showPopup, activatePopup] = useState(false);
 

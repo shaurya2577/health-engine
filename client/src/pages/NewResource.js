@@ -10,11 +10,19 @@ import { AuthProvider } from "../AuthContext";
 
 function NewResource() {
   const [title, setTitle] = useState("");
+  const [url, setURL] = useState("");
   const [description, setDescription] = useState("");
   const [tag, setTag] = useState("Partnership");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedTag, setSelectedTag] = useState("");
+
   const navigate = useNavigate();
+
+  const handleSelectTag = (tag) => {
+    setSelectedTag(tag);
+    setTag(tag);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -93,18 +101,59 @@ function NewResource() {
                 ></textarea>
               </div>
               <div className="mt-6">
-                {/* 
-                TODO: change to dropdown but from backend provided values
-                TODO: allow frontend user to select "other" option and add a new custom tag
-                 */}
-                <div className="mb-2">
-                  Card Tag (partnership, dataset, guide)
+                <div className="mb-2">Card Tag</div>
+                <div>
+                  <button
+                    className={`px-3 rounded-md py-1 text-lg ${
+                      selectedTag === "partnership"
+                        ? "bg-card-orange text-white"
+                        : "bg-gray-200"
+                    }`}
+                    onClick={() => handleSelectTag("partnership")}
+                  >
+                    Partnership
+                  </button>
+                  <button
+                    className={`ml-2 px-3 rounded-md py-1 text-lg ${
+                      selectedTag === "dataset"
+                        ? "bg-card-orange text-white"
+                        : "bg-gray-200"
+                    }`}
+                    onClick={() => handleSelectTag("dataset")}
+                  >
+                    Dataset
+                  </button>
+                  <button
+                    className={`ml-2 px-2 rounded-md py-1 text-lg ${
+                      selectedTag === "guide"
+                        ? "bg-card-orange text-white"
+                        : "bg-gray-200"
+                    }`}
+                    onClick={() => handleSelectTag("guide")}
+                  >
+                    Guide
+                  </button>
+                  <button
+                    className={`ml-2 px-2 rounded-md py-1 text-lg ${
+                      selectedTag === "other"
+                        ? "bg-card-orange text-white"
+                        : "bg-gray-200"
+                    }`}
+                    onClick={() => handleSelectTag("other")}
+                  >
+                    Other
+                  </button>
                 </div>
+              </div>
+              <div className="mt-6">
+                <div className="mb-2">Resource URL Link</div>
                 <input
                   required
-                  placeholder="partnership"
-                  className="pl-2 rounded-md py-1 placeholder:italic text-lg"
-                  onChange={(e) => setTag(e.target.value.toLowerCase())}
+                  placeholder="url"
+                  className="pl-2 rounded-md py-1 placeholder:italic text-lg w-full"
+                  onChange={(e) => {
+                    setURL(e.target.value);
+                  }}
                 ></input>
               </div>
               <div>
@@ -122,12 +171,14 @@ function NewResource() {
                   title="Default Title"
                   description="Default Description"
                   tag={tag}
+                  url={url}
                 ></ResourceCard>
               ) : (
                 <ResourceCard
                   title={title}
                   description={description}
                   tag={tag}
+                  url={url}
                 ></ResourceCard>
               )}
               <div className="mt-4 italic">
