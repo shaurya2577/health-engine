@@ -10,7 +10,7 @@ function ResourceDashboard(props) {
           <ResourceCard
             title={resource_entry.title}
             description={resource_entry.description}
-            tag={resource_entry.class}
+            tag={resource_entry.tag}
             link={resource_entry.link}
           ></ResourceCard>
         </div>

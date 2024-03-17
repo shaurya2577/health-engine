@@ -19,7 +19,7 @@ app.post("/newResource", async (req, res) => {
 
   try {
     const newResource = await pool.query(
-      "INSERT INTO resources (description, title, class, link) VALUES($1, $2, $3, $4) RETURNING *;",
+      "INSERT INTO resources (description, title, tag, link) VALUES($1, $2, $3, $4) RETURNING *;",
       [description, title, tag, link]
     );
 
