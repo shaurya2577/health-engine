@@ -20,20 +20,24 @@ function ResourceCard(props) {
   return (
     <div>
       {showPopup && (
-        <div className="absolute top-0 left-0 w-screen h-screen bg-gray-900 bg-opacity-50 z-49">
-          <div className="absolute top-[14vh] left-[10vw] z-50 w-[80vw] h-[80vh] bg-gray-400 justify-center items-center">
-            <h5 className="ml-10 mt-7 text-white font-semibold top-0 left-0 pt-[12px]">
-              {" "}
-              {tag}{" "}
-            </h5>
-            <div className="px-6 pb-6 pt-1 ml-10 mt-10 ">
-              <h1 className="text-white mb-2 text-7xl font-bold tracking-tight text-gray-900 dark:text-white">
-                {" "}
-                {title}{" "}
-              </h1>
-              <h3 className="ml-1 text-3xl font-semibold text-gray-900">
-                {" "}
-                {description}{" "}
+        <div
+          className="absolute top-0 left-0 w-screen h-screen bg-gray-900 bg-opacity-50 z-49"
+          onClick={closeClick} // This will trigger when the overlay is clicked
+        >
+          <div
+            className="absolute top-[20vh] left-[20vw] z-50 w-[60vw] h-[60vh] bg-site-bg justify-center items-center rounded-sm shadow-"
+            onClick={(e) => e.stopPropagation()} // This prevents click from bubbling up to the overlay
+          >
+            <div className="mx-24 mb-16 mt-24">
+              <div className="flex align-middle content-center justify-items-center">
+                <div className="font-bold text-2xl">{title}</div>
+                <div className="font-semibold text-white bg-card-orange w-28 text-center rounded-full pt-[6px] ml-6 text-sm">
+                  {tag}
+                </div>
+              </div>
+              <h3 className="mt-4">{description}</h3>
+              <h3 className="mt-4 underline italic absolute bottom-28">
+                Resource Link
               </h3>
               <button className="close" onClick={closeClick}>
                 <span
@@ -47,6 +51,7 @@ function ResourceCard(props) {
           </div>
         </div>
       )}
+
       <div
         className="bg-card-orange rounded-xl shadow-lg shadow-orange-200 min-h-[190px] hover:cursor-pointer"
         onClick={handleClick}
