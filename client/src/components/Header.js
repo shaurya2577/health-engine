@@ -101,30 +101,15 @@ function Header() {
                 {user.name}
               </div>
               {isOpen && (
-                <div className="absolute right-6 mt-2 w-48 bg-white shadow-md rounded-md py-2">
-                  {/*
-                  <div className="block px-4 py-2 text-sm text-gray-700">
-                    {user.email}
-                  </div>
-                  */}
+                <div className="absolute right-6 mt-2 w-48 bg-white shadow-md rounded-md py-2 hover:bg-gray-100">
                   <div
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                    className="block px-4 py-2 text-sm text-gray-700 cursor-pointer"
                     onClick={handleSignOut}
                   >
                     Logout
                   </div>
                 </div>
               )}
-              {/*
-              <img
-                src={user.picture}
-                alt="User"
-                className="rounded-full w-10 h-10 mr-2"
-              />
-              <button onClick={(e) => handleSignOut(e)} className="ml-5">
-                Sign Out
-              </button>
-              */}
             </div>
           )}
         </div>

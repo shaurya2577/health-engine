@@ -36,8 +36,10 @@ function ResourceCard(props) {
                 </div>
               </div>
               <h3 className="mt-4">{description}</h3>
-              <h3 className="mt-4 underline italic absolute bottom-28">
-                Resource Link
+              <h3 className="mt-4 underline italic absolute bottom-28 hover:cursor-pointer">
+                <a href="https://www.example.com" target="_blank">
+                  <div>Resource Link</div>
+                </a>
               </h3>
               <button className="close" onClick={closeClick}>
                 <span
