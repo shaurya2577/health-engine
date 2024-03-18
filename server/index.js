@@ -12,30 +12,42 @@ app.use(express.json());
 
 // create a new resource
 app.post("/newResource", async (req, res) => {
-  const { description, title, tag } = req.body;
-  if (!description || !title || !tag) {
+  const { description, title, tag, link } = req.body;
+  if (!description || !title || !tag || !link) {
     return res.status(400).send("Input is not formatted properly");
   }
 
   try {
     const newResource = await pool.query(
-      "INSERT INTO resources (description, title, class) VALUES($1, $2, $3) RETURNING *;",
-      [description, title, tag]
+      "INSERT INTO resources (description, title, tag, link) VALUES($1, $2, $3, $4) RETURNING *;",
+      [description, title, tag, link]
     );
 
     res.json(newResource.rows[0]);
   } catch (error) {
+    console.log(error);
     res.status(500).send("Server or database error");
   }
 });
 
 // get all resources
-app.get("/resources", async (_req, res) => {
+app.get("/resources", async (req, res) => {
   try {
     const allResources = await pool.query("SELECT * FROM resources;");
     res.json(allResources.rows);
   } catch (error) {
+    console.log(error);
     res.status(500).send("Server or database error");
+  }
+});
+
+app.post("/verifylogin", async (req, res) => {
+  const { password } = req.body;
+  const correct_ref = "readysethealth123";
+  if (password == correct_ref) {
+    res.status(200).json({ status: true });
+  } else {
+    res.status(200).json({ status: false, message: "Incorrect password" });
   }
 });
 

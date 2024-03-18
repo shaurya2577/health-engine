@@ -1,6 +1,10 @@
 import Home from "./pages/Home";
+import About from "./pages/About";
 import NewResource from "./pages/NewResource";
+import Login from "./pages/Login"; // Import the PasswordEntry component
 import Todo from "./pages/Todo";
+import VerifyPassword from "./VerifyPassword";
+import { useEffect, useState } from "react";
 
 import {
   BrowserRouter as Router,
@@ -17,7 +21,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />}></Route>
         <Route path="/home" element={<Home />}></Route>
-        <Route path="/new" element={<NewResource />}></Route>
+        <Route path="/newResource" element={<NewResource />}></Route>
+        <Route path="/login" element={<Login />}></Route>
         <Route path="/todo" element={<Todo />}></Route>
       </Routes>
     </BrowserRouter>

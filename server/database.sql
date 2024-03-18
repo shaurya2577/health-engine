@@ -1,10 +1,10 @@
 CREATE DATABASE ResourceDatabase;
-CREATE TYPE tag AS ENUM ('partnership', 'dataset', 'guide');
 
 CREATE TABLE resources(
     resource_id SERIAL PRIMARY KEY,
     description VARCHAR(256),
     title VARCHAR(256),
-    class tag
+    link VARCHAR(2084),
+    tag VARCHAR(32)
 );
 
