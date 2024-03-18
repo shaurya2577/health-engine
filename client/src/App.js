@@ -1,4 +1,5 @@
 import Home from "./pages/Home";
+import About from "./pages/About";
 import NewResource from "./pages/NewResource";
 import Login from "./pages/Login"; // Import the PasswordEntry component
 import Todo from "./pages/Todo";
@@ -22,7 +23,6 @@ function App() {
         <Route path="/home" element={<Home />}></Route>
         <Route path="/newResource" element={<NewResource />}></Route>
         <Route path="/login" element={<Login />}></Route>
-
         <Route path="/todo" element={<Todo />}></Route>
       </Routes>
     </BrowserRouter>

@@ -82,10 +82,6 @@ function Header() {
           <a href="https://airtable.com/appDKUYdh9WE3Zjhs/shrolgo8UQ4wyMNuw">
             <div>Investor Database</div>
           </a>
-          <a href="https://readysethealth.io">
-            <div>About</div>
-          </a>
-
           {!isSignedIn && (
             <div>
               <div id="signInDiv" className="-mt-2"></div>
