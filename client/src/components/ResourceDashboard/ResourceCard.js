@@ -5,15 +5,15 @@ function ResourceCard(props) {
   const title = props.title;
   const description = props.description;
   const tag = props.tag.charAt(0).toUpperCase() + props.tag.slice(1);
-  const url = props.url;
+  const link = props.link;
 
   const [showPopup, activatePopup] = useState(false);
 
-  function handleClick(props) {
+  function handleClick() {
     activatePopup(true);
   }
 
-  function closeClick(props) {
+  function closeClick() {
     activatePopup(false);
   }
 
@@ -37,7 +37,7 @@ function ResourceCard(props) {
               </div>
               <h3 className="mt-4">{description}</h3>
               <h3 className="mt-4 underline italic absolute bottom-28 hover:cursor-pointer">
-                <a href="https://www.example.com" target="_blank">
+                <a href={link} target="_blank">
                   <div>Resource Link</div>
                 </a>
               </h3>

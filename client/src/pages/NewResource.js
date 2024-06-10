@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { server_url } from "../constants";
 import { useNavigate } from "react-router-dom";
 import { Navigate } from "react-router-dom";
+import { supabase } from "../createclient";
 
 import ResourceCard from "../components/ResourceDashboard/ResourceCard";
 import BaseLayout from "../layouts/BaseLayout";
@@ -28,19 +29,22 @@ function NewResource() {
     event.preventDefault();
     const body = { description: description, title: title, tag: tag, link: link};
 
-    const response = await fetch("http://localhost:3002/newResource", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    // const response = await fetch("http://localhost:3002/newResource", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(body),
+    // });
 
+    const { data, error } = await supabase.from("resources").insert([body]);
+
+    console.log("New resource added: ", data);
     navigate("/");
 
-    if (response.ok) {
-      const data = await response.json();
-    } else {
-      console.error("Failed to add new resource");
-    }
+    // if (response.ok) {
+    //   const data = await response.json();
+    // } else {
+    //   console.error("Failed to add new resource");
+    // }
   };
 
   useEffect(() => {

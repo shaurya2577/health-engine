@@ -3,6 +3,7 @@ import BaseLayout from "../layouts/BaseLayout";
 import ResourceDashboard from "../components/ResourceDashboard";
 import { server_url } from "../constants";
 import { AuthProvider, useAuth } from "../AuthContext";
+import { supabase } from "../createclient";
 
 function Content() {
   const [allResources, setAllResources] = useState([]);
@@ -12,10 +13,11 @@ function Content() {
 
   const getAllResources = async () => {
     try {
-      const response = await fetch(`${server_url}/resources`);
-      const data = await response.json();
+      // const response = await fetch(`${server_url}/resources`);
+      // const data = await response.json();
+      const { data } = await supabase.from("resources").select();
       setAllResources(data);
-      setFilteredResources(allResources);
+      setFilteredResources(data); // Setting filteredResources initially with all resources
     } catch (error) {
       console.error(error.message);
     }
@@ -33,10 +35,6 @@ function Content() {
   useEffect(() => {
     getAllResources();
   }, []);
-
-  useEffect(() => {
-    setFilteredResources(allResources);
-  }, [allResources]);
 
   return (
     <div>
@@ -86,7 +84,7 @@ function Content() {
             <div className="mx-24 mb-24">
               <ResourceDashboard
                 filteredResources={filteredResources}
-              ></ResourceDashboard>
+              />
             </div>
           </div>
         )}
@@ -98,7 +96,7 @@ function Content() {
 function Home() {
   return (
     <AuthProvider>
-      <BaseLayout>{true && <Content></Content>}</BaseLayout>
+      <BaseLayout>{true && <Content />}</BaseLayout>
     </AuthProvider>
   );
 }
