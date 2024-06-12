@@ -55,7 +55,7 @@ function ResourceCard(props) {
       )}
 
       <div
-        className="bg-card-orange rounded-xl shadow-lg shadow-orange-200 min-h-[190px] hover:cursor-pointer"
+        className="card bg-card-orange rounded-xl shadow-lg shadow-orange-200 min-h-[190px] hover:cursor-pointer"
         onClick={handleClick}
       >
         <div className="text-white font-semibold text-right px-4 pt-[12px]">

@@ -12,6 +12,20 @@ module.exports = {
         "card-orange": "#fa7c5c",
         "site-black": "#260b00",
       },
+      keyframes: {
+        moveUp: {
+          '0%': { transform: 'translateY(0)' },
+          '100%': { transform: 'translateY(-10px)' },
+        },
+        moveDown: {
+          '0%': { transform: 'translateY(-10px)' },
+          '100%': { transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        moveUp: 'moveUp 0.3s ease-out forwards',
+        moveDown: 'moveDown 0.3s ease-out forwards',
+      },
     },
   },
   plugins: [],

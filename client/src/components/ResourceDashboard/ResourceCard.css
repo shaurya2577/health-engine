@@ -21,7 +21,13 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.card {
+  transition: transform 0.3s ease-out;
+}
 
+.card:hover {
+  transform: translateY(-10px);
+}
 
 .section {
   margin-bottom: 20px;
@@ -121,11 +127,11 @@
   border-radius: 12px;
   padding: 20px;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease-out;
 }
 
 .resource-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-10px);
 }
 
 .tag {
