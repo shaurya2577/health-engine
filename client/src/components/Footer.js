@@ -4,7 +4,7 @@ function Footer() {
   return (
     <div className="mb-6 ml-32 text-[10px]">
       <div>
-        Built by Oliver Ye and Dev Patel. Visit{" "}
+        Built by <a href="https://github.com/devpatelio">Dev Patel</a> and <a href="https://www.linkedin.com/in/ye-oliver">Oliver Ye</a>. Visit{" "}
         <a
           href="https://www.readysethealth.io/"
           className="underline"
