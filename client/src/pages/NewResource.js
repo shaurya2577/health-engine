@@ -3,12 +3,14 @@ import { server_url } from "../constants";
 import { useNavigate } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { createClient } from "@supabase/supabase-js";
 
 
 import ResourceCard from "../components/ResourceDashboard/ResourceCard";
 import BaseLayout from "../layouts/BaseLayout";
 import VerifyPassword from "../VerifyPassword";
 import { AuthProvider } from "../AuthContext";
+import { supabase } from "../createclient";
 
 function NewResource() {
   const [title, setTitle] = useState("");
@@ -23,46 +25,54 @@ function NewResource() {
     event.preventDefault();
     const body = { description: description, title: title, tag: tag, link: link};
 
-    const response = await fetch("http://localhost:3002/newResource", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    // const response = await fetch("http://localhost:3002/newResource", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(body),
+    // });
+
+    const { data, error } = await supabase.from('resources').insert([body]);
+
+    if (error) {
+      console.error('Error inserting data: ', error);
+    } else {
+      console.log('Data added successfully')
+    }
 
     navigate("/");
 
-    if (response.ok) {
-      const data = await response.json();
-    } else {
-      console.error("Failed to add new resource");
-    }
+    // if (response.ok) {
+    //   const data = await response.json();
+    // } else {
+    //   console.error("Failed to add new resource");
+    // }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let login = await VerifyPassword();
-        setIsLoggedIn(login);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error verifying login:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       let login = await VerifyPassword();
+  //       setIsLoggedIn(login);
+  //       setIsLoading(false);
+  //     } catch (error) {
+  //       console.error("Error verifying login:", error);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center h-[80vh] justify-center">
-        <div className="text-2xl">Loading...</div>
-      </div>
-    );
-  }
+  // // if (isLoading) {
+  //   return (
+  //     <div className="flex items-center h-[80vh] justify-center">
+  //       <div className="text-2xl">Loading...</div>
+  //     </div>
+  //   );
+  // // }
 
-  if (!isLoggedIn) {
-    return <Navigate to="/login" />;
-  }
+  // if (!isLoggedIn) {
+  //   return <Navigate to="/login" />;
+  // }
 
   return (
     <div>
