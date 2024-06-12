@@ -40,7 +40,7 @@ function Content() {
     if (filter === "*") {
       setFilteredResources(allResources);
     } else {
-      const filtered = allResources.filter((item) => item.class === filter);
+      const filtered = allResources.filter((item) => item.tag === filter);
       setFilteredResources(filtered);
     }
   }
