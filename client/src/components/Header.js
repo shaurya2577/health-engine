@@ -79,13 +79,9 @@ function Header() {
         <div className="flex text-xl justify-self-end gap-7 font-medium mt-5 mr-20 text-site-black col-span-2">
           <a href="/">
             <div>Resources</div>
-          
           </a>
           <a href="https://airtable.com/appDKUYdh9WE3Zjhs/shrolgo8UQ4wyMNuw">
             <div>Investor Database</div>
-          </a>
-          <a href="/analytics">
-            <div>Analytics</div>
           </a>
           {!isSignedIn && (
             <div className="-mt-1">
