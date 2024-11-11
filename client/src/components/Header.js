@@ -81,11 +81,14 @@ function Header() {
             <div>Resources</div>
           
           </a>
-          <a href="https://airtable.com/appDKUYdh9WE3Zjhs/shrolgo8UQ4wyMNuw">
+          <a href="/investors">
             <div>Investor Database</div>
           </a>
-          <a href="/analytics">
+          {/* <a href="/analytics">
             <div>Analytics</div>
+          </a> */}
+          <a href="/network">
+            <div>Network</div>
           </a>
           {!isSignedIn && (
             <div className="-mt-1">
