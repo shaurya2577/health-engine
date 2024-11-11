@@ -10,7 +10,7 @@ function Login({ setPasswordVerified }) {
     event.preventDefault();
     // Check if the password is correct
     try {
-      const response = await fetch("/verifylogin", {
+      const response = await fetch("http://localhost:3002/verifylogin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
