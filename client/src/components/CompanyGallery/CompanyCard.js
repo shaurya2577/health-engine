@@ -8,10 +8,10 @@ function CompanyCard({ company }) {
         <img
           src={company.logo}
           alt={`${company.name} logo`}
-          className="absolute top-0 left-0 w-full h-full object-contain p-4 bg-gray-50"
+          className="absolute top-0 left-0 w-full h-full object-contain p-4 bg-white"
           onError={(e) => {
             e.target.src = '/default-logo.png'; // Add a default logo image
-            e.target.className = "absolute top-0 left-0 w-full h-full object-contain p-4 bg-gray-50 opacity-50";
+            e.target.className = "absolute top-0 left-0 w-full h-full object-contain p-4 bg-white opacity-50";
           }}
         />
       </div>
