@@ -8,6 +8,7 @@ import Network from "./pages/Network";
 import VerifyPassword from "./VerifyPassword";
 import { useEffect, useState } from "react";
 import InvestorDashboard from "./pages/InvestorDashboard";
+import CompanyGallery from "./pages/CompanyGallery";
 
 import {
   BrowserRouter as Router,
@@ -31,6 +32,7 @@ function App() {
         <Route path="/network" element={<Network />}></Route>
         <Route path="/investors" element={<InvestorDashboard />}></Route>
         <Route path="/analytics" element={<Analytics />}></Route>
+        <Route path="/companies" element={<CompanyGallery />}></Route>
 
       </Routes>
     </BrowserRouter>

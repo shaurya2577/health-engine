@@ -84,9 +84,9 @@ function Header() {
           <a href="/investors">
             <div>Investor Database</div>
           </a>
-          {/* <a href="/analytics">
-            <div>Analytics</div>
-          </a> */}
+          <a href="/companies">
+            <div>Portfolio</div>
+          </a>
           <a href="/network">
             <div>Network</div>
           </a>
