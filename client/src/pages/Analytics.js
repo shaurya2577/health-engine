@@ -12,7 +12,7 @@ function AnalyticsContent() {
   useEffect(() => {
     async function fetchReports() {
       if (isSignedIn) {
-        const { data, error } = await analyticsSupabase
+        const { data, error } = await analyticsSupabase()
           .from("reports")
           .select("*");
         if (error) {
@@ -64,7 +64,7 @@ function AnalyticsContent() {
 function Analytics() {
   return (
     <AuthProvider>
-      <GoogleOAuthProvider clientId="731231387889-jtv4doi6v3asmmhuf7d7537jkjcpsfta.apps.googleusercontent.com">
+      <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
         <BaseLayout>
           <AnalyticsContent />
         </BaseLayout>

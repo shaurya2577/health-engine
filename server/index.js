@@ -1,74 +1,49 @@
-const express = require("express");
-const cors = require("cors");
-const db = require("./db");
-const constants = require("./constants");
-const pool = require("./db");
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import jobsRouter from './routes/jobs.js';
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 4000;
 
-// middleware
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// create a new resource
-app.post("/newResource", async (req, res) => {
-  const { description, title, tag, link } = req.body;
-  if (!description || !title || !tag || !link) {
-    return res.status(400).send("Input is not formatted properly");
-  }
-
-  try {
-    const newResource = await pool.query(
-      "INSERT INTO resources (description, title, tag, link) VALUES($1, $2, $3, $4) RETURNING *;",
-      [description, title, tag, link]
-    );
-
-    res.json(newResource.rows[0]);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Server or database error");
-  }
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, timestamp: new Date().toISOString() });
 });
 
-// get all resources
-app.get("/resources", async (req, res) => {
-  try {
-    const allResources = await pool.query("SELECT * FROM resources;");
-    res.json(allResources.rows);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Server or database error");
-  }
+// Mount routes
+app.use('/api/jobs', jobsRouter);
+
+// Error handling middleware
+app.use((error, req, res, next) => {
+  console.error('Unhandled error:', error);
+  res.status(500).json({
+    error: 'INTERNAL_SERVER_ERROR',
+    message: 'An unexpected error occurred'
+  });
 });
 
-app.post("/verifylogin", async (req, res) => {
-  const { password } = req.body;
-  const correct_ref = "readysethealth123";
-  if (password == correct_ref) {
-    res.status(200).json({ status: true });
-  } else {
-    res.status(200).json({ status: false, message: "Incorrect password" });
-  }
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({
+    error: 'NOT_FOUND',
+    message: `Route ${req.originalUrl} not found`
+  });
 });
 
-// see one resource
-app.get("/resources/:resourceID", async (req, res) => {
-  const { resource_id } = req.params;
-  if (!resource_id) {
-    return res.status(400).send("Input is not formatted properly");
-  }
-
-  try {
-    const resource_fetch = await pool.query(
-      "SELECT * FROM resources WHERE resource_id = $1;",
-      [resource_id]
-    );
-    res.json(resource_fetch.rows[0]);
-  } catch (error) {
-    res.status(500).send("Server or database error");
-  }
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`💼 Jobs API: http://localhost:${PORT}/api/jobs`);
+  console.log(`\n⚠️  Note: Airtable connection will be tested on first API request`);
 });
 
-app.listen(3002, () => {
-  console.log("db listening on port 3002");
-});
+export default app;

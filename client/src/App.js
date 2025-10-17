@@ -9,6 +9,7 @@ import VerifyPassword from "./VerifyPassword";
 import { useEffect, useState } from "react";
 import InvestorDashboard from "./pages/InvestorDashboard";
 import CompanyGallery from "./pages/CompanyGallery";
+import JobBoard from "./pages/JobBoard";
 
 import {
   BrowserRouter as Router,
@@ -33,6 +34,7 @@ function App() {
         <Route path="/investors" element={<InvestorDashboard />}></Route>
         <Route path="/analytics" element={<Analytics />}></Route>
         <Route path="/companies" element={<CompanyGallery />}></Route>
+        <Route path="/jobs" element={<JobBoard />}></Route>
 
       </Routes>
     </BrowserRouter>

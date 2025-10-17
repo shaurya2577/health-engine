@@ -6,7 +6,7 @@ import BaseLayout from "../layouts/BaseLayout";
 function InvestorDashboard() {
     return (
         <AuthProvider> 
-        <GoogleOAuthProvider clientId="731231387889-jtv4doi6v3asmmhuf7d7537jkjcpsfta.apps.googleusercontent.com">
+        <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
         <BaseLayout>
         <div className="pb-20">
             <div>

@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import "./securityCheck"; // Run security check on app start
 
 import {
   BrowserRouter as Router,

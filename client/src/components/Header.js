@@ -87,6 +87,9 @@ function Header() {
           <a href="/companies">
             <div>Portfolio</div>
           </a>
+          <a href="/jobs">
+            <div>Jobs</div>
+          </a>
           <a href="/network">
             <div>Network</div>
           </a>

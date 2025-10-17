@@ -9,7 +9,7 @@ import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 
 
 
-const supabase = createClient("https://uroadliwkfihxotrzrzl.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyb2FkbGl3a2ZpaHhvdHJ6cnpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM0MDgxMTYsImV4cCI6MjAyODk4NDExNn0.meDlxb1L614PWVOuB6XuMuoDdogVbxHwl1cVjuy66fE");
+const supabase = createClient(process.env.REACT_APP_SUPABASE_URL, process.env.REACT_APP_SUPABASE_ANON_KEY);
 
 
 function Content() {
@@ -17,7 +17,6 @@ function Content() {
   const [filteredResources, setFilteredResources] = useState([]);
   const { isSignedIn, setIsSignedIn } = useAuth();
   const checkState = isSignedIn;
-  //console.log(checkState);
 
   const getAllResources = async () => {
     try {
@@ -28,7 +27,6 @@ function Content() {
       if (error) {
         throw error;
       }
-      console.log(data);
       setAllResources(data);
     } catch (error) {
       console.error('Error fetching resources:', error.message);
@@ -114,7 +112,7 @@ function Content() {
 function Home() {
   return (
     <AuthProvider> 
-      <GoogleOAuthProvider clientId="731231387889-jtv4doi6v3asmmhuf7d7537jkjcpsfta.apps.googleusercontent.com">
+      <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
       <BaseLayout>
         {true && <Content />}
       </BaseLayout>

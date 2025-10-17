@@ -1,4 +1,13 @@
 {
+  "name": "health-engine",
+  "version": "1.0.0",
+  "description": "Health Engine job board application",
+  "scripts": {
+    "server": "cd server && npm start",
+    "server:dev": "cd server && npm run dev",
+    "client": "cd client && npm start",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
   "dependencies": {
     "@react-oauth/google": "^0.12.1",
     "react-google-login": "^5.2.2"

@@ -1,87 +1,74 @@
 import React, { useState, useEffect } from "react";
-import { server_url } from "../constants";
 import { useNavigate } from "react-router-dom";
 import { Navigate } from "react-router-dom";
-import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
-import { createClient } from "@supabase/supabase-js";
-
-
 import ResourceCard from "../components/ResourceDashboard/ResourceCard";
 import BaseLayout from "../layouts/BaseLayout";
-import VerifyPassword from "../VerifyPassword";
-import { AuthProvider } from "../AuthContext";
-import { supabase } from "../createclient";
+import { useAuth } from "../AuthContext";
 
 function NewResource() {
   const [title, setTitle] = useState("");
   const [link, setLink] = useState("https://readysethealth.io")
   const [description, setDescription] = useState("");
   const [tag, setTag] = useState("Partnership");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { isSignedIn, getAuthHeaders, loading } = useAuth();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsSubmitting(true);
+    setError("");
+    
     const body = { description: description, title: title, tag: tag, link: link};
 
-    // const response = await fetch("http://localhost:3002/newResource", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(body),
-    // });
+    try {
+      const response = await fetch("http://localhost:3002/newResource", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(body),
+      });
 
-    const { data, error } = await supabase.from('resources').insert([body]);
-
-    if (error) {
-      console.error('Error inserting data: ', error);
-    } else {
-      console.log('Data added successfully')
+      if (response.ok) {
+        const data = await response.json();
+        navigate("/");
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to create resource");
+      }
+    } catch (error) {
+      console.error("Error creating resource:", error);
+      setError("Network error. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    navigate("/");
-
-    // if (response.ok) {
-    //   const data = await response.json();
-    // } else {
-    //   console.error("Failed to add new resource");
-    // }
   };
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       let login = await VerifyPassword();
-  //       setIsLoggedIn(login);
-  //       setIsLoading(false);
-  //     } catch (error) {
-  //       console.error("Error verifying login:", error);
-  //     }
-  //   };
+  if (loading) {
+    return (
+      <div className="flex items-center h-[80vh] justify-center">
+        <div className="text-2xl">Loading...</div>
+      </div>
+    );
+  }
 
-  //   fetchData();
-  // }, []);
-
-  // // if (isLoading) {
-  //   return (
-  //     <div className="flex items-center h-[80vh] justify-center">
-  //       <div className="text-2xl">Loading...</div>
-  //     </div>
-  //   );
-  // // }
-
-  // if (!isLoggedIn) {
-  //   return <Navigate to="/login" />;
-  // }
+  if (!isSignedIn) {
+    return <Navigate to="/login" />;
+  }
 
   return (
-    <div>
-      <AuthProvider>
-      <GoogleOAuthProvider clientId="731231387889-jtv4doi6v3asmmhuf7d7537jkjcpsfta.apps.googleusercontent.com">
-        <BaseLayout>
-          <div className="mx-24 text-2xl">
-            Add a new resource to the Health Engine resources database
-          </div>
+    <BaseLayout>
+      <div className="mx-24 text-2xl">
+        Add a new resource to the Health Engine resources database
+      </div>
+      {error && (
+        <div className="mx-24 mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
           <div className="grid grid-cols-2 mt-16">
             <div className="mx-24 text-2xl flex flex-col ">
 
@@ -109,8 +96,6 @@ function NewResource() {
               </div>
               <div className="mt-6">
                 {/* 
-                TODO: change to dropdown but from backend provided values
-                TODO: allow frontend user to select "other" option and add a new custom tag
                  */}
                 <div className="mb-2">
                   Card Tag (partnership, dataset, guide)
@@ -138,10 +123,11 @@ function NewResource() {
 
               <div className="mb-12">
                 <button
-                  className="bg-card-orange text-white font-bold py-2 px-4 rounded mt-8 hover:opacity-90"
+                  className="bg-card-orange text-white font-bold py-2 px-4 rounded mt-8 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleSubmit}
+                  disabled={isSubmitting}
                 >
-                  Submit
+                  {isSubmitting ? "Creating..." : "Submit"}
                 </button>
               </div>
 
@@ -172,9 +158,6 @@ function NewResource() {
             </div>
           </div>
         </BaseLayout>
-        </GoogleOAuthProvider>
-      </AuthProvider>
-    </div>
   );
 }
 

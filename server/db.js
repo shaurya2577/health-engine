@@ -1,33 +1,34 @@
+require('dotenv').config();
 const Pool = require("pg").Pool;
 
-// for local testing, change user and password as needed
-const pool = new Pool({
-user: "postgres",
-password: "1104AInnov8!",
-host: "localhost",
-port: 5433,
-database: "resourcedatabase",
+// Database configuration with environment variables
+let pool;
+
+if (process.env.DATABASE_URL) {
+  // Production configuration
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  });
+} else {
+  // Development configuration
+  pool = new Pool({
+    user: process.env.DB_USER || "postgres",
+    password: process.env.DB_PASSWORD || "1104AInnov8!",
+    host: process.env.DB_HOST || "localhost",
+    port: process.env.DB_PORT || 5433,
+    database: process.env.DB_NAME || "resourcedatabase",
+  });
+}
+
+// Test database connection
+pool.on('connect', () => {
+  console.log('Connected to PostgreSQL database');
 });
 
-// const pool = new Pool({
-//   user: "postgres",
-//   password: "oliverye77",
-//   host: "localhost",
-//   port: 5432,
-//   database: "resourcedatabase",
-// });
-
-// const pool = new Pool({
-//   user: "postgres",
-//   password: "oliverye77",
-//   host: "localhost",
-//   port: 5432,
-//   database: "resourcedatabase",
-// });
-
-// uncomment for production
-// const pool = new Pool({
-//   connectionString: process.env.DATABASE_URL,
-// });
+pool.on('error', (err) => {
+  console.error('Database connection error:', err);
+  process.exit(-1);
+});
 
 module.exports = pool;

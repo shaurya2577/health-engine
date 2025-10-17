@@ -10,14 +10,13 @@ function CompanyGallery() {
 
   useEffect(() => {
     async function fetchCompanies() {
-      const { data, error } = await companiesSupabase
+      const { data, error } = await companiesSupabase()
         .from("companies")
         .select("*");
       
       if (error) {
         console.error("Error fetching companies:", error);
       } else {
-        console.log(data);
         setCompanies(data);
       }
     }
@@ -27,7 +26,7 @@ function CompanyGallery() {
 
   return (
     <AuthProvider>
-      <GoogleOAuthProvider clientId="731231387889-jtv4doi6v3asmmhuf7d7537jkjcpsfta.apps.googleusercontent.com">
+      <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
         <BaseLayout>
           <div className="pb-20">
             <div className="flex flex-col items-center pt-12 mb-8 font-bold text-site-black">

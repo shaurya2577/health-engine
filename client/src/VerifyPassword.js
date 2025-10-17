@@ -1,23 +1,32 @@
-async function VerifyPassword() {
-  const password = localStorage.getItem("password");
-  try {
-    const response = await fetch("http://localhost:3002/verifylogin", {
+import { useAuth } from './AuthContext';
 
+async function VerifyPassword() {
+  const token = localStorage.getItem("authToken");
+  
+  if (!token) {
+    return false;
+  }
+
+  try {
+    const response = await fetch("http://localhost:3002/verify-token", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
     });
 
-    const data = await response.json();
-    if (data.status == true) {
-      console.log("true");
+    if (response.ok) {
+      console.log("Token is valid");
       return true;
     } else {
-      console.log("fals");
+      console.log("Token is invalid");
+      localStorage.removeItem("authToken");
       return false;
     }
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Token verification error:", error);
+    localStorage.removeItem("authToken");
     return false;
   }
 }

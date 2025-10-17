@@ -1,32 +1,35 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext";
 
 function Login({ setPasswordVerified }) {
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Check if the password is correct
+    setLoading(true);
+    setMsg("");
+    
     try {
-      const response = await fetch("http://localhost:3002/verifylogin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-
-      const data = await response.json();
-      localStorage.setItem("password", password);
-      if (data.status == true) {
+      const result = await login(password);
+      
+      if (result.success) {
         setMsg("");
+        setPasswordVerified(true);
         navigate("/newResource");
       } else {
-        setMsg("Incorrect password.");
+        setMsg(result.message || "Login failed");
         setPassword("");
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Login error:", error);
+      setMsg("An unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,20 +42,23 @@ function Login({ setPasswordVerified }) {
         <form>
           <input
             required
-            type="text"
+            type="password"
             id="password"
-            className="w-full"
+            className="w-full p-2 border border-gray-300 rounded"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            placeholder="Enter your password"
+            disabled={loading}
           />
-          <div className="text-center text-sm italic text-red-400">{msg}</div>
+          <div className="text-center text-sm italic text-red-400 mt-2">{msg}</div>
           <div className="flex justify-center">
             <button
               onClick={handleSubmit}
-              className="bg-gray-300 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded inline-block mt-8"
+              disabled={loading}
+              className="bg-gray-300 hover:bg-gray-200 disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-800 font-semibold py-2 px-4 rounded inline-block mt-8"
               type="submit"
             >
-              continue
+              {loading ? "Signing in..." : "Continue"}
             </button>
           </div>
         </form>
