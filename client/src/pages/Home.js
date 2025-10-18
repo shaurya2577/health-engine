@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import BaseLayout from "../layouts/BaseLayout";
 import ResourceDashboard from "../components/ResourceDashboard";
-import { server_url } from "../constants";
 import { AuthProvider, useAuth } from "../AuthContext";
-// import { supabase } from '../createclient.js';
 import { createClient } from "@supabase/supabase-js";
-import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 
 
@@ -15,7 +13,7 @@ const supabase = createClient(process.env.REACT_APP_SUPABASE_URL, process.env.RE
 function Content() {
   const [allResources, setAllResources] = useState([]);
   const [filteredResources, setFilteredResources] = useState([]);
-  const { isSignedIn, setIsSignedIn } = useAuth();
+  const { isSignedIn } = useAuth();
   const checkState = isSignedIn;
 
   const getAllResources = async () => {
