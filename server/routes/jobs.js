@@ -1,5 +1,11 @@
 import express from 'express';
 import Airtable from 'airtable';
+import { 
+  validateResource, 
+  validateJobApplication, 
+  validateUniversalApplication,
+  handleValidationErrors 
+} from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -120,7 +126,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create new job
-router.post('/', async (req, res) => {
+router.post('/', validateResource, async (req, res) => {
   try {
     if (!base) {
       return res.status(503).json({
@@ -177,7 +183,7 @@ router.post('/', async (req, res) => {
 });
 
 // Submit job application
-router.post('/:id/apply', async (req, res) => {
+router.post('/:id/apply', validateJobApplication, async (req, res) => {
   try {
     const { id } = req.params;
     const applicationData = req.body;
@@ -216,7 +222,7 @@ router.post('/:id/apply', async (req, res) => {
 });
 
 // Submit universal application
-router.post('/universal-apply', async (req, res) => {
+router.post('/universal-apply', validateUniversalApplication, async (req, res) => {
   try {
     const applicationData = req.body;
     console.log('📄 Submitting universal application:', applicationData);

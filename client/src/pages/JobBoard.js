@@ -55,57 +55,6 @@ function JobBoardContent() {
     portfolio: ""
   });
 
-  // Sample job data as fallback
-  const sampleJobs = [
-    {
-      id: 1,
-      title: "Senior Software Engineer",
-      company: "HealthTech Innovations",
-      location: "San Francisco, CA",
-      category: "engineering",
-      description: "We're looking for a senior software engineer to join our team and help build the next generation of healthcare technology.",
-      requirements: "5+ years experience, React, Node.js, Healthcare domain knowledge preferred",
-      salary: "$120,000 - $160,000",
-      type: "full-time",
-      postedDate: "2024-01-15"
-    },
-    {
-      id: 2,
-      title: "Product Manager",
-      company: "MediConnect",
-      location: "New York, NY",
-      category: "product",
-      description: "Lead product development for our patient engagement platform.",
-      requirements: "3+ years PM experience, Healthcare background, Agile methodology",
-      salary: "$100,000 - $140,000",
-      type: "full-time",
-      postedDate: "2024-01-14"
-    },
-    {
-      id: 3,
-      title: "Data Scientist",
-      company: "HealthAI Solutions",
-      location: "Remote",
-      category: "data",
-      description: "Join our team to develop machine learning models for healthcare applications.",
-      requirements: "PhD in Data Science, Python, TensorFlow, Healthcare data experience",
-      salary: "$130,000 - $180,000",
-      type: "full-time",
-      postedDate: "2024-01-13"
-    },
-    {
-      id: 4,
-      title: "UX Designer",
-      company: "CareFlow",
-      location: "Austin, TX",
-      category: "design",
-      description: "Design intuitive user experiences for healthcare professionals.",
-      requirements: "3+ years UX design, Figma, Healthcare app experience preferred",
-      salary: "$80,000 - $110,000",
-      type: "full-time",
-      postedDate: "2024-01-12"
-    }
-  ];
 
   useEffect(() => {
     loadJobs();
@@ -115,29 +64,33 @@ function JobBoardContent() {
     setLoading(true);
     setApiStatus('checking');
     try {
-      const apiJobs = await jobsApi.list();
-      if (apiJobs && apiJobs.length > 0) {
-        setJobs(apiJobs);
-        setFilteredJobs(apiJobs);
+      const response = await jobsApi.list();
+      console.log('API Response:', response);
+      
+      // Handle the Airtable API response format
+      if (response && response.success && response.jobs && response.jobs.length > 0) {
+        setJobs(response.jobs);
+        setFilteredJobs(response.jobs);
         setApiStatus('connected');
         setError(null);
+        console.log(`✅ Loaded ${response.jobs.length} jobs from Airtable`);
       } else {
-        // Fallback to sample data if API returns empty
-        setJobs(sampleJobs);
-        setFilteredJobs(sampleJobs);
-        setApiStatus('sample-data');
-        setError('Using sample data. No jobs found from API.');
+        // No jobs found in Airtable
+        setJobs([]);
+        setFilteredJobs([]);
+        setApiStatus('connected');
+        setError('No jobs found in the database.');
       }
     } catch (error) {
       console.error('Error loading jobs:', error);
-      setJobs(sampleJobs);
-      setFilteredJobs(sampleJobs);
-      setApiStatus('sample-data');
+      setJobs([]);
+      setFilteredJobs([]);
+      setApiStatus('error');
       if (error instanceof JobsApiError) {
         setError(`API Error: ${error.message}`);
         setApiError(error);
       } else {
-        setError('Using sample data. API connection failed.');
+        setError('API connection failed.');
         setApiError(error);
       }
     } finally {
@@ -190,14 +143,8 @@ function JobBoardContent() {
   const handlePostJob = async (e) => {
     e.preventDefault();
     try {
-      // Note: Job posting via API not implemented yet - will be added in server
-      // For now, add to local state
-      const jobToAdd = {
-        ...newJob,
-        id: jobs.length + 1,
-        postedDate: new Date().toISOString().split('T')[0]
-      };
-      setJobs([jobToAdd, ...jobs]);
+      // TODO: Implement job posting via API
+      alert('Job posting feature coming soon! This will be connected to the Airtable database.');
       setNewJob({
         title: "",
         company: "",
@@ -209,7 +156,6 @@ function JobBoardContent() {
         type: "full-time"
       });
       setIsPostingJob(false);
-      alert('Job posted successfully! (Stored locally - will persist until page refresh)');
     } catch (error) {
       console.error('Error posting job:', error);
       alert('Error posting job. Please try again.');
@@ -318,29 +264,6 @@ function JobBoardContent() {
         <div className="text-[65px] -mt-6">Job Board</div>
       </div>
 
-      {/* Status Indicator */}
-      <div className="mx-24 mb-4">
-        {apiStatus === 'checking' && (
-          <div className="p-3 bg-blue-100 border border-blue-400 text-blue-700 rounded">
-            🔄 Checking API connection...
-          </div>
-        )}
-        {apiStatus === 'connected' && (
-          <div className="p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-            ✅ Connected to job board API
-          </div>
-        )}
-        {apiStatus === 'sample-data' && (
-          <div className="p-3 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
-            📝 Using sample data mode - Jobs will be stored locally until page refresh
-            {apiError && (
-              <div className="mt-2 text-sm">
-                <strong>API Error:</strong> {apiError.message}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
 
       {!isSignedIn && (
         <div className="text-3xl justify-center items-center flex mb-8">

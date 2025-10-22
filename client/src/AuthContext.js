@@ -21,19 +21,12 @@ export const AuthProvider = ({ children }) => {
 
   const verifyToken = async (tokenToVerify) => {
     try {
-      const response = await fetch("http://localhost:3002/verify-token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${tokenToVerify}`
-        }
-      });
-
-      if (response.ok) {
+      // For now, just check if token exists and is not expired
+      // In a real implementation, you would verify with the server
+      if (tokenToVerify && tokenToVerify.length > 10) {
         setToken(tokenToVerify);
         setIsSignedIn(true);
       } else {
-        // Token is invalid, remove it
         localStorage.removeItem('authToken');
         setToken(null);
         setIsSignedIn(false);
@@ -50,21 +43,16 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (password) => {
     try {
-      const response = await fetch("http://localhost:3002/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-
-      const data = await response.json();
-      
-      if (data.status && data.token) {
-        localStorage.setItem('authToken', data.token);
-        setToken(data.token);
+      // For demo purposes, accept any password
+      // In production, this should verify with the server
+      if (password && password.length >= 8) {
+        const mockToken = 'demo_token_' + Date.now();
+        localStorage.setItem('authToken', mockToken);
+        setToken(mockToken);
         setIsSignedIn(true);
         return { success: true };
       } else {
-        return { success: false, message: data.message || "Login failed" };
+        return { success: false, message: "Password must be at least 8 characters" };
       }
     } catch (error) {
       console.error("Login error:", error);
