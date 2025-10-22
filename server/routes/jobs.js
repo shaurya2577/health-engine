@@ -1,268 +1,257 @@
 import express from 'express';
-import base from '../airtable.js';
+import Airtable from 'airtable';
 
 const router = express.Router();
 
-// Helper function to handle Airtable errors
-const handleAirtableError = (error, res) => {
-  console.error('Airtable Error:', error);
-  const statusCode = error.statusCode || 500;
-  const errorType = error.error || 'UNKNOWN_ERROR';
-  
-  res.status(statusCode).json({
-    error: `AIRTABLE_${errorType}_FAILED`,
-    message: error.message,
-    statusCode
-  });
+// Initialize Airtable (only if credentials are available)
+let base = null;
+if (process.env.AIRTABLE_PAT && process.env.AIRTABLE_BASE_ID) {
+  try {
+    base = new Airtable({ 
+      apiKey: process.env.AIRTABLE_PAT 
+    }).base(process.env.AIRTABLE_BASE_ID);
+    console.log('✅ Airtable connection initialized');
+  } catch (error) {
+    console.warn('⚠️  Airtable connection failed:', error.message);
+  }
+} else {
+  console.warn('⚠️  Airtable credentials not found. Set AIRTABLE_PAT and AIRTABLE_BASE_ID in .env file');
+}
+
+// Table names
+const TABLES = {
+  JOBS: 'Jobs',
+  APPLICATIONS: 'Applications',
+  UNIVERSAL_APPLICATIONS: 'Universal Applications'
 };
 
-// Helper function for pagination
-const getPaginatedRecords = async (tableName, options = {}) => {
-  if (!base) {
-    throw new Error('Airtable not configured');
-  }
-  
-  const { offset = 0, pageSize = 100, sort = [] } = options;
-  
-  const selectOptions = {
-    view: 'Grid view',
-    pageSize: Math.min(pageSize, 100), // Airtable max is 100
-  };
-  
-  if (sort.length > 0) {
-    selectOptions.sort = sort;
-  }
-  
-  if (offset > 0) {
-    selectOptions.offset = offset;
-  }
-  
-  return await base(tableName).select(selectOptions).all();
-};
-
-// GET /api/jobs - List all jobs
+// Get all jobs
 router.get('/', async (req, res) => {
   try {
-    // Check if Airtable is configured
     if (!base) {
-      console.log('Airtable not configured - returning sample data');
-      const sampleJobs = [
-        {
-          id: 'sample-1',
-          title: 'Senior Software Engineer',
-          company: 'HealthTech Innovations',
-          location: 'San Francisco, CA',
-          category: 'engineering',
-          description: 'We\'re looking for a senior software engineer to join our team and help build the next generation of healthcare technology.',
-          requirements: '5+ years experience, React, Node.js, Healthcare domain knowledge preferred',
-          salary: '$120,000 - $160,000',
-          type: 'full-time',
-          postedDate: '2024-01-15'
-        },
-        {
-          id: 'sample-2',
-          title: 'Product Manager',
-          company: 'MediConnect',
-          location: 'New York, NY',
-          category: 'product',
-          description: 'Lead product development for our patient engagement platform.',
-          requirements: '3+ years PM experience, Healthcare background, Agile methodology',
-          salary: '$100,000 - $140,000',
-          type: 'full-time',
-          postedDate: '2024-01-14'
-        }
-      ];
-      return res.json(sampleJobs);
+      return res.status(503).json({
+        success: false,
+        error: 'Airtable not configured',
+        message: 'Please set AIRTABLE_PAT and AIRTABLE_BASE_ID environment variables'
+      });
     }
-
-    console.log('Fetching jobs from Airtable...');
-    const records = await getPaginatedRecords('Jobs', {
+    
+    console.log('📋 Fetching jobs from Airtable...');
+    
+    const records = await base(TABLES.JOBS).select({
       sort: [{ field: 'Posted Date', direction: 'desc' }]
-    });
+    }).all();
     
     const jobs = records.map(record => ({
       id: record.id,
-      title: record.get('Title') || '',
-      company: record.get('Company') || '',
-      location: record.get('Location') || '',
-      category: record.get('Category') || '',
-      description: record.get('Description') || '',
-      requirements: record.get('Requirements') || '',
-      salary: record.get('Salary') || '',
-      type: record.get('Type') || 'full-time',
-      postedDate: record.get('Posted Date') || new Date().toISOString().split('T')[0],
+      title: record.get('Title'),
+      company: record.get('Company'),
+      location: record.get('Location'),
+      category: record.get('Category'),
+      description: record.get('Description'),
+      requirements: record.get('Requirements'),
+      salary: record.get('Salary'),
+      type: record.get('Type'),
+      postedDate: record.get('Posted Date'),
       airtableId: record.id
     }));
     
-    console.log(`Successfully fetched ${jobs.length} jobs`);
-    res.json(jobs);
-  } catch (error) {
-    handleAirtableError(error, res);
-  }
-});
-
-// POST /api/jobs/apply - Submit job application
-router.post('/apply', async (req, res) => {
-  try {
-    const {
-      jobId,
-      jobTitle,
-      company,
-      name,
-      email,
-      phone,
-      resumeUrl,
-      coverLetter,
-      linkedin,
-      portfolio,
-      status = 'Pending Review'
-    } = req.body;
-    
-    // Basic validation
-    if (!email || !name || !jobId) {
-      return res.status(400).json({
-        error: 'VALIDATION_ERROR',
-        message: 'Missing required fields: email, name, jobId'
-      });
-    }
-    
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        error: 'VALIDATION_ERROR',
-        message: 'Invalid email format'
-      });
-    }
-    
-    // URL validation for resumeUrl if provided
-    if (resumeUrl) {
-      try {
-        new URL(resumeUrl);
-      } catch {
-        return res.status(400).json({
-          error: 'VALIDATION_ERROR',
-          message: 'Invalid resume URL format'
-        });
-      }
-    }
-    
-    // Check if Airtable is configured
-    if (!base) {
-      console.log('Airtable not configured - simulating application submission');
-      return res.json({ id: 'simulated-' + Date.now() });
-    }
-    
-    console.log('Creating job application in Airtable...');
-    const record = await base('Applications').create({
-      'Job ID': String(jobId),
-      'Job Title': String(jobTitle || ''),
-      'Company': String(company || ''),
-      'Applicant Name': String(name).trim(),
-      'Email': String(email).trim(),
-      'Phone': String(phone || '').trim(),
-      'Resume URL': String(resumeUrl || '').trim(),
-      'Cover Letter': String(coverLetter || '').trim(),
-      'LinkedIn': String(linkedin || '').trim(),
-      'Portfolio': String(portfolio || '').trim(),
-      'Application Date': new Date().toISOString(),
-      'Status': String(status).trim()
+    console.log(`✅ Successfully fetched ${jobs.length} jobs`);
+    res.json({
+      success: true,
+      count: jobs.length,
+      jobs
     });
     
-    console.log(`Successfully created application: ${record.id}`);
-    res.json({ id: record.id });
   } catch (error) {
-    handleAirtableError(error, res);
+    console.error('❌ Error fetching jobs:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch jobs',
+      message: error.message
+    });
   }
 });
 
-// POST /api/jobs/universal - Submit universal application
-router.post('/universal', async (req, res) => {
+// Get single job
+router.get('/:id', async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      phone,
-      university,
-      graduationYear,
-      major,
-      resumeUrl,
-      linkedin,
-      portfolio,
-      interests,
-      experience,
-      skills
-    } = req.body;
-    
-    // Basic validation
-    if (!email || !name) {
-      return res.status(400).json({
-        error: 'VALIDATION_ERROR',
-        message: 'Missing required fields: email, name'
-      });
-    }
-    
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        error: 'VALIDATION_ERROR',
-        message: 'Invalid email format'
-      });
-    }
-    
-    // URL validation for resumeUrl if provided
-    if (resumeUrl) {
-      try {
-        new URL(resumeUrl);
-      } catch {
-        return res.status(400).json({
-          error: 'VALIDATION_ERROR',
-          message: 'Invalid resume URL format'
-        });
-      }
-    }
-    
-    // Convert graduationYear to number if provided
-    let gradYear = null;
-    if (graduationYear) {
-      gradYear = parseInt(graduationYear, 10);
-      if (isNaN(gradYear)) {
-        return res.status(400).json({
-          error: 'VALIDATION_ERROR',
-          message: 'Invalid graduation year format'
-        });
-      }
-    }
-    
-    // Check if Airtable is configured
     if (!base) {
-      console.log('Airtable not configured - simulating universal application submission');
-      return res.json({ id: 'simulated-universal-' + Date.now() });
+      return res.status(503).json({
+        success: false,
+        error: 'Airtable not configured',
+        message: 'Please set AIRTABLE_PAT and AIRTABLE_BASE_ID environment variables'
+      });
     }
     
-    console.log('Creating universal application in Airtable...');
-    const record = await base('Universal Applications').create({
-      'Name': String(name).trim(),
-      'Email': String(email).trim(),
-      'Phone': String(phone || '').trim(),
-      'University': String(university || '').trim(),
-      'Graduation Year': gradYear,
-      'Major': String(major || '').trim(),
-      'Resume URL': String(resumeUrl || '').trim(),
-      'LinkedIn': String(linkedin || '').trim(),
-      'Portfolio': String(portfolio || '').trim(),
-      'Interests': String(interests || '').trim(),
-      'Experience': String(experience || '').trim(),
-      'Skills': String(skills || '').trim(),
+    const { id } = req.params;
+    console.log(`🔍 Fetching job ${id} from Airtable...`);
+    
+    const record = await base(TABLES.JOBS).find(id);
+    
+    const job = {
+      id: record.id,
+      title: record.get('Title'),
+      company: record.get('Company'),
+      location: record.get('Location'),
+      category: record.get('Category'),
+      description: record.get('Description'),
+      requirements: record.get('Requirements'),
+      salary: record.get('Salary'),
+      type: record.get('Type'),
+      postedDate: record.get('Posted Date'),
+      airtableId: record.id
+    };
+    
+    console.log(`✅ Successfully fetched job: ${job.title}`);
+    res.json({
+      success: true,
+      job
+    });
+    
+  } catch (error) {
+    console.error('❌ Error fetching job:', error);
+    res.status(404).json({
+      success: false,
+      error: 'Job not found',
+      message: error.message
+    });
+  }
+});
+
+// Create new job
+router.post('/', async (req, res) => {
+  try {
+    if (!base) {
+      return res.status(503).json({
+        success: false,
+        error: 'Airtable not configured',
+        message: 'Please set AIRTABLE_PAT and AIRTABLE_BASE_ID environment variables'
+      });
+    }
+    
+    const jobData = req.body;
+    console.log('📝 Creating new job in Airtable:', jobData);
+    
+    const record = await base(TABLES.JOBS).create({
+      'Title': jobData.title,
+      'Company': jobData.company,
+      'Location': jobData.location,
+      'Category': jobData.category,
+      'Description': jobData.description,
+      'Requirements': jobData.requirements,
+      'Salary': jobData.salary,
+      'Type': jobData.type,
+      'Posted Date': new Date().toISOString().split('T')[0]
+    });
+    
+    const job = {
+      id: record.id,
+      title: record.get('Title'),
+      company: record.get('Company'),
+      location: record.get('Location'),
+      category: record.get('Category'),
+      description: record.get('Description'),
+      requirements: record.get('Requirements'),
+      salary: record.get('Salary'),
+      type: record.get('Type'),
+      postedDate: record.get('Posted Date'),
+      airtableId: record.id
+    };
+    
+    console.log(`✅ Successfully created job: ${job.title}`);
+    res.status(201).json({
+      success: true,
+      message: 'Job created successfully',
+      job
+    });
+    
+  } catch (error) {
+    console.error('❌ Error creating job:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create job',
+      message: error.message
+    });
+  }
+});
+
+// Submit job application
+router.post('/:id/apply', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const applicationData = req.body;
+    console.log(`📄 Submitting application for job ${id}:`, applicationData);
+    
+    const record = await base(TABLES.APPLICATIONS).create({
+      'Job ID': id,
+      'Job Title': applicationData.jobTitle,
+      'Company': applicationData.company,
+      'Applicant Name': applicationData.name,
+      'Email': applicationData.email,
+      'Phone': applicationData.phone,
+      'Resume URL': applicationData.resumeUrl,
+      'Cover Letter': applicationData.coverLetter,
+      'LinkedIn': applicationData.linkedin,
+      'Portfolio': applicationData.portfolio,
+      'Application Date': new Date().toISOString(),
+      'Status': 'Pending'
+    });
+    
+    console.log(`✅ Successfully submitted application: ${record.id}`);
+    res.status(201).json({
+      success: true,
+      message: 'Application submitted successfully',
+      applicationId: record.id
+    });
+    
+  } catch (error) {
+    console.error('❌ Error submitting application:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to submit application',
+      message: error.message
+    });
+  }
+});
+
+// Submit universal application
+router.post('/universal-apply', async (req, res) => {
+  try {
+    const applicationData = req.body;
+    console.log('📄 Submitting universal application:', applicationData);
+    
+    const record = await base(TABLES.UNIVERSAL_APPLICATIONS).create({
+      'Name': applicationData.name,
+      'Email': applicationData.email,
+      'Phone': applicationData.phone,
+      'University': applicationData.university,
+      'Graduation Year': applicationData.graduationYear,
+      'Major': applicationData.major,
+      'Resume URL': applicationData.resumeUrl,
+      'LinkedIn': applicationData.linkedin,
+      'Portfolio': applicationData.portfolio,
+      'Interests': applicationData.interests,
+      'Experience': applicationData.experience,
+      'Skills': applicationData.skills,
       'Application Date': new Date().toISOString(),
       'Status': 'Pending Review'
     });
     
-    console.log(`Successfully created universal application: ${record.id}`);
-    res.json({ id: record.id });
+    console.log(`✅ Successfully submitted universal application: ${record.id}`);
+    res.status(201).json({
+      success: true,
+      message: 'Universal application submitted successfully',
+      applicationId: record.id
+    });
+    
   } catch (error) {
-    handleAirtableError(error, res);
+    console.error('❌ Error submitting universal application:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to submit universal application',
+      message: error.message
+    });
   }
 });
 
