@@ -9,6 +9,7 @@ function Footer() {
           href="https://www.readysethealth.io/"
           className="underline"
           target="_blank"
+          rel="noopener noreferrer"
         >
           https://www.readysethealth.io/
         </a>{" "}

@@ -37,7 +37,7 @@ function ResourceCard(props) {
               </div>
               <h3 className="mt-4">{description}</h3>
               <h3 className="mt-4 underline italic absolute bottom-28 hover:cursor-pointer">
-                <a href={link} target="_blank">
+                <a href={link} target="_blank" rel="noopener noreferrer">
                   <div>Resource Link</div>
                 </a>
               </h3>
