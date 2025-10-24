@@ -17,6 +17,7 @@ function JobBoardContent() {
   const [error, setError] = useState(null);
   const [apiStatus, setApiStatus] = useState('checking');
   const [apiError, setApiError] = useState(null);
+  const [jobOptions, setJobOptions] = useState({ categories: [], types: [] });
   const { isSignedIn, user } = useAuth();
 
   const [newJob, setNewJob] = useState({
@@ -58,7 +59,22 @@ function JobBoardContent() {
 
   useEffect(() => {
     loadJobs();
+    loadJobOptions();
   }, []);
+
+  const loadJobOptions = async () => {
+    try {
+      const response = await jobsApi.getOptions();
+      if (response.success) {
+        setJobOptions({
+          categories: response.categories,
+          types: response.types
+        });
+      }
+    } catch (error) {
+      console.error('Error loading job options:', error);
+    }
+  };
 
   const loadJobs = async () => {
     setLoading(true);
@@ -143,8 +159,8 @@ function JobBoardContent() {
   const handlePostJob = async (e) => {
     e.preventDefault();
     try {
-      // TODO: Implement job posting via API
-      alert('Job posting feature coming soon! This will be connected to the Airtable database.');
+      await jobsApi.postJob(newJob);
+      alert('Job posted successfully! It will be reviewed and published soon.');
       setNewJob({
         title: "",
         company: "",
@@ -156,9 +172,15 @@ function JobBoardContent() {
         type: "full-time"
       });
       setIsPostingJob(false);
+      // Reload jobs to show the new one
+      loadJobs();
     } catch (error) {
       console.error('Error posting job:', error);
-      alert('Error posting job. Please try again.');
+      if (error instanceof JobsApiError) {
+        alert(`Error posting job: ${error.message}`);
+      } else {
+        alert('Error posting job. Please try again.');
+      }
     }
   };
 
@@ -201,6 +223,7 @@ function JobBoardContent() {
         jobTitle: selectedJob.title,
         company: selectedJob.company
       };
+      console.log('Submitting application data:', applicationData);
       await jobsApi.apply(applicationData);
       alert('Application submitted successfully! The company will review your application.');
       setJobApplication({
@@ -349,16 +372,15 @@ function JobBoardContent() {
                 <input
                   type="url"
                   name="resumeUrl"
-                  placeholder="Resume URL (Google Drive, Dropbox, etc.)"
+                  placeholder="Resume URL (optional - Google Drive, Dropbox, etc.)"
                   value={universalApplication.resumeUrl}
                   onChange={(e) => handleInputChange(e, 'universal')}
-                  required
                   className="border border-gray-300 rounded-lg px-4 py-2"
                 />
                 <input
                   type="url"
                   name="linkedin"
-                  placeholder="LinkedIn Profile"
+                  placeholder="LinkedIn Profile (optional)"
                   value={universalApplication.linkedin}
                   onChange={(e) => handleInputChange(e, 'universal')}
                   className="border border-gray-300 rounded-lg px-4 py-2"
@@ -366,7 +388,7 @@ function JobBoardContent() {
                 <input
                   type="url"
                   name="portfolio"
-                  placeholder="Portfolio/GitHub"
+                  placeholder="Portfolio/GitHub (optional)"
                   value={universalApplication.portfolio}
                   onChange={(e) => handleInputChange(e, 'universal')}
                   className="border border-gray-300 rounded-lg px-4 py-2"
@@ -390,7 +412,7 @@ function JobBoardContent() {
               />
               <textarea
                 name="skills"
-                placeholder="Key skills and technologies"
+                placeholder="Key skills and technologies (optional)"
                 value={universalApplication.skills}
                 onChange={(e) => handleInputChange(e, 'universal')}
                 rows="2"
@@ -427,9 +449,10 @@ function JobBoardContent() {
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-lg font-medium hover:bg-gray-50"
           >
-            {categories.map(category => (
-              <option key={category.value} value={category.value}>
-                {category.label}
+            <option value="all">All Categories</option>
+            {jobOptions.categories.map(category => (
+              <option key={category} value={category}>
+                {category}
               </option>
             ))}
           </select>
@@ -497,9 +520,9 @@ function JobBoardContent() {
                   className="border border-gray-300 rounded-lg px-4 py-2"
                 >
                   <option value="">Select Category</option>
-                  {categories.slice(1).map(category => (
-                    <option key={category.value} value={category.value}>
-                      {category.label}
+                  {jobOptions.categories.map(category => (
+                    <option key={category} value={category}>
+                      {category}
                     </option>
                   ))}
                 </select>
@@ -517,10 +540,12 @@ function JobBoardContent() {
                   onChange={(e) => handleInputChange(e, 'job')}
                   className="border border-gray-300 rounded-lg px-4 py-2"
                 >
-                  <option value="full-time">Full-time</option>
-                  <option value="part-time">Part-time</option>
-                  <option value="contract">Contract</option>
-                  <option value="internship">Internship</option>
+                  <option value="">Select Type</option>
+                  {jobOptions.types.map(type => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
                 </select>
               </div>
               <textarea
@@ -597,16 +622,15 @@ function JobBoardContent() {
                   <input
                     type="url"
                     name="resumeUrl"
-                    placeholder="Resume URL"
+                    placeholder="Resume URL (optional)"
                     value={jobApplication.resumeUrl}
                     onChange={(e) => handleInputChange(e, 'application')}
-                    required
                     className="border border-gray-300 rounded-lg px-4 py-2"
                   />
                   <input
                     type="url"
                     name="linkedin"
-                    placeholder="LinkedIn Profile"
+                    placeholder="LinkedIn Profile (optional)"
                     value={jobApplication.linkedin}
                     onChange={(e) => handleInputChange(e, 'application')}
                     className="border border-gray-300 rounded-lg px-4 py-2"
@@ -614,7 +638,7 @@ function JobBoardContent() {
                   <input
                     type="url"
                     name="portfolio"
-                    placeholder="Portfolio/GitHub"
+                    placeholder="Portfolio/GitHub (optional)"
                     value={jobApplication.portfolio}
                     onChange={(e) => handleInputChange(e, 'application')}
                     className="border border-gray-300 rounded-lg px-4 py-2"
@@ -689,7 +713,7 @@ function JobBoardContent() {
                 
                 <div className="flex justify-between items-center">
                   <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                    {categories.find(cat => cat.value === job.category)?.label || job.category}
+                    {job.category}
                   </span>
                   {isSignedIn && (
                     <button 

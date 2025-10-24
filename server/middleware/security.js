@@ -1,5 +1,5 @@
-const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 
 // Rate limiting configuration
 const createRateLimit = (windowMs, max, message) => {
@@ -86,7 +86,7 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 
-module.exports = {
+export {
   generalLimiter,
   loginLimiter,
   resourceLimiter,

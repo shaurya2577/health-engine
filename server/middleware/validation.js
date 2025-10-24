@@ -1,4 +1,4 @@
-const { body, validationResult, param } = require('express-validator');
+import { body, validationResult, param } from 'express-validator';
 
 // Validation middleware
 const handleValidationErrors = (req, res, next) => {
@@ -31,8 +31,7 @@ const validateResource = [
     .escape(),
   body('link')
     .isURL({ protocols: ['http', 'https'] })
-    .withMessage('Link must be a valid URL')
-    .normalizeUrl(),
+    .withMessage('Link must be a valid URL'),
   handleValidationErrors
 ];
 
@@ -73,7 +72,11 @@ const validateJobApplication = [
     .withMessage('Phone number must be less than 20 characters')
     .escape(),
   body('resumeUrl')
-    .isURL({ protocols: ['http', 'https'] })
+    .optional()
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) return true;
+      return /^https?:\/\/.+/.test(value);
+    })
     .withMessage('Resume URL must be a valid URL'),
   body('coverLetter')
     .optional()
@@ -83,11 +86,17 @@ const validateJobApplication = [
     .escape(),
   body('linkedin')
     .optional()
-    .isURL({ protocols: ['http', 'https'] })
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) return true;
+      return /^https?:\/\/.+/.test(value);
+    })
     .withMessage('LinkedIn URL must be a valid URL'),
   body('portfolio')
     .optional()
-    .isURL({ protocols: ['http', 'https'] })
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) return true;
+      return /^https?:\/\/.+/.test(value);
+    })
     .withMessage('Portfolio URL must be a valid URL'),
   handleValidationErrors
 ];
@@ -117,8 +126,15 @@ const validateUniversalApplication = [
     .escape(),
   body('graduationYear')
     .optional()
-    .isInt({ min: 1900, max: 2030 })
-    .withMessage('Graduation year must be between 1900 and 2030'),
+    .trim()
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) return true;
+      const year = parseInt(value, 10);
+      if (isNaN(year) || year < 1900 || year > 2030) {
+        throw new Error('Graduation year must be between 1900 and 2030');
+      }
+      return true;
+    }),
   body('major')
     .optional()
     .trim()
@@ -126,15 +142,25 @@ const validateUniversalApplication = [
     .withMessage('Major must be less than 100 characters')
     .escape(),
   body('resumeUrl')
-    .isURL({ protocols: ['http', 'https'] })
+    .optional()
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) return true;
+      return /^https?:\/\/.+/.test(value);
+    })
     .withMessage('Resume URL must be a valid URL'),
   body('linkedin')
     .optional()
-    .isURL({ protocols: ['http', 'https'] })
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) return true;
+      return /^https?:\/\/.+/.test(value);
+    })
     .withMessage('LinkedIn URL must be a valid URL'),
   body('portfolio')
     .optional()
-    .isURL({ protocols: ['http', 'https'] })
+    .custom((value) => {
+      if (value === '' || value === null || value === undefined) return true;
+      return /^https?:\/\/.+/.test(value);
+    })
     .withMessage('Portfolio URL must be a valid URL'),
   body('interests')
     .optional()
@@ -157,12 +183,60 @@ const validateUniversalApplication = [
   handleValidationErrors
 ];
 
-module.exports = {
+// Job posting validation
+const validateJobPosting = [
+  body('title')
+    .trim()
+    .isLength({ min: 1, max: 200 })
+    .withMessage('Title must be between 1 and 200 characters')
+    .escape(),
+  body('company')
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Company must be between 1 and 100 characters')
+    .escape(),
+  body('location')
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Location must be between 1 and 100 characters')
+    .escape(),
+  body('category')
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage('Category must be between 1 and 50 characters')
+    .escape(),
+  body('description')
+    .trim()
+    .isLength({ min: 1, max: 2000 })
+    .withMessage('Description must be between 1 and 2000 characters')
+    .escape(),
+  body('requirements')
+    .optional()
+    .trim()
+    .isLength({ max: 1000 })
+    .withMessage('Requirements must be less than 1000 characters')
+    .escape(),
+  body('salary')
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage('Salary must be less than 100 characters')
+    .escape(),
+  body('type')
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage('Type must be between 1 and 50 characters')
+    .escape(),
+  handleValidationErrors
+];
+
+export {
   validateResource,
   validateLogin,
   validateResourceId,
   validateJobApplication,
   validateUniversalApplication,
+  validateJobPosting,
   handleValidationErrors
 };
 

@@ -51,6 +51,11 @@ export const jobsApi = {
     return apiRequest('/jobs');
   },
 
+  // Get job options (categories and types)
+  async getOptions() {
+    return apiRequest('/jobs/options');
+  },
+
   // Apply to a specific job
   async apply(payload) {
     return apiRequest('/jobs/apply', {
@@ -62,6 +67,14 @@ export const jobsApi = {
   // Submit universal application
   async submitUniversal(payload) {
     return apiRequest('/jobs/universal', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  // Post a new job
+  async postJob(payload) {
+    return apiRequest('/jobs', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
